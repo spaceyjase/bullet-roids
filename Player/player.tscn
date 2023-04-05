@@ -1,0 +1,40 @@
+[gd_scene load_steps=8 format=3 uid="uid://c6j1o3ex8fll4"]
+
+[ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_13pqw"]
+[ext_resource type="Script" path="res://Player/Player.cs" id="1_bhe4s"]
+[ext_resource type="Script" path="res://Player/States/Idle.cs" id="2_jv1s3"]
+[ext_resource type="Script" path="res://Player/States/Move.cs" id="3_1uwoj"]
+[ext_resource type="Script" path="res://StateMachine/StateMachine.cs" id="3_7cq7a"]
+[ext_resource type="Script" path="res://Player/States/Dead.cs" id="4_6alcx"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lqjmw"]
+radius = 7.0
+
+[node name="Player" type="Node2D"]
+script = ExtResource("1_bhe4s")
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_lqjmw")
+debug_color = Color(0, 0.6, 0.701961, 0.419608)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_13pqw")
+region_enabled = true
+region_rect = Rect2(392, 8, 48, 48)
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("3_7cq7a")
+
+[node name="Idle" type="Node" parent="StateMachine"]
+script = ExtResource("2_jv1s3")
+
+[node name="Move" type="Node" parent="StateMachine"]
+script = ExtResource("3_1uwoj")
+
+[node name="Dead" type="Node" parent="StateMachine"]
+script = ExtResource("4_6alcx")
+
+[connection signal="area_entered" from="Area2D" to="." method="OnArea2d_Area_Entered"]
+[connection signal="area_exited" from="Area2D" to="." method="OnArea2d_Area_Exited"]
