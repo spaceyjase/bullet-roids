@@ -2,13 +2,13 @@ using Godot;
 
 namespace Player;
 
-public partial class Player : Node2D
+public partial class Player : Moveable.Moveable
 {
   [Export]
-  public float MovementSpeed { get; set; }
+  private float MovementSpeed { get; set; }
   [Export]
-  public float RotationSpeed { get; set; }
-  
+  private float RotationSpeed { get; set; }
+
   private int collisionCount;
   private bool active;
 
@@ -38,12 +38,14 @@ public partial class Player : Node2D
   {
     // TODO: bullet check, set property if true
     ++CollisionCount;
+    GD.Print($"{area} CollisionCount: {CollisionCount}");
   }
 
   private void OnArea2d_Area_Exited(Area2D area)
   {
     // TODO: bullet check, set property if true
     --CollisionCount;
+    GD.Print($"{area} CollisionCount: {CollisionCount}");
   }
 
   public bool Colliding => CollisionCount > 0;
@@ -61,7 +63,5 @@ public partial class Player : Node2D
   {
     Position += movement * MovementSpeed * (float)delta;
     Rotation += rotation * RotationSpeed * (float)delta;
-    // TODO: check for screen wrap
   }
-
 }

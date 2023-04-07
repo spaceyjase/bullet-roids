@@ -33,7 +33,7 @@ glow_blend_mode = 0
 [node name="GameScene" type="Node2D"]
 
 [node name="SpaceParticles" type="GPUParticles2D" parent="."]
-position = Vector2(576, 320)
+position = Vector2(576, 400)
 scale = Vector2(3, 3)
 amount = 1000
 process_material = SubResource("ParticleProcessMaterial_u6hjc")
@@ -41,13 +41,14 @@ lifetime = 30.0
 preprocess = 30.0
 local_coords = true
 
+[node name="Camera2D" type="Camera2D" parent="." groups=["Camera"]]
+anchor_mode = 0
+zoom = Vector2(0.6, 0.6)
+
 [node name="Player" parent="." instance=ExtResource("1_v3eyx")]
-position = Vector2(224, 280)
+position = Vector2(576, 400)
 MovementSpeed = 350.0
 RotationSpeed = 5.0
-
-[node name="Camera2D" type="Camera2D" parent="."]
-anchor_mode = 0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_vh0tc")
