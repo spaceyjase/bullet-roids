@@ -8,24 +8,20 @@ public partial class Idle : PlayerState
   {
     base._Ready();
 
-    OnEnter += () => { };
     OnProcess += DoProcess;
   }
 
   private void DoProcess(double delta)
   {
     if (!player.IsActive) return;
-
-    var left = Input.IsActionPressed("left");
-    var right = Input.IsActionPressed("right");
-    var up = Input.IsActionPressed("up");
-    var down = Input.IsActionPressed("down");
-    var rotate_left = Input.IsActionPressed("rotate_left");
-    var rotate_right = Input.IsActionPressed("rotate_right");
-
-    if (left || right || up || down || rotate_left || rotate_right)
+    
+    if (MoveCheck())
     {
-      StateMachine?.ChangeState("Move");
+      StateMachine?.ChangeState(nameof(Move));
+    }
+    if (Input.IsActionPressed("shoot"))
+    {
+      StateMachine?.ChangeState(nameof(Shoot));
     }
   }
 }

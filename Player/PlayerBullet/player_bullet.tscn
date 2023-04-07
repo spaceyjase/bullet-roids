@@ -1,0 +1,44 @@
+[gd_scene load_steps=6 format=3 uid="uid://q6cjlbo4ve0u"]
+
+[ext_resource type="Script" path="res://Player/PlayerBullet/PlayerBullet.cs" id="1_c7hx0"]
+[ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_me6jl"]
+[ext_resource type="AudioStream" uid="uid://fx3n6wqteyxt" path="res://Assets/big one.ogg" id="3_xnj57"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ug60h"]
+radius = 8.0
+height = 32.0
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_frfh3"]
+streams_count = 1
+stream_0/stream = ExtResource("3_xnj57")
+stream_0/weight = 1.0
+
+[node name="PlayerBullet" type="Node2D"]
+script = ExtResource("1_c7hx0")
+speed = 1250
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 18
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CapsuleShape2D_ug60h")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.2, 0.5)
+texture = ExtResource("1_me6jl")
+region_enabled = true
+region_rect = Rect2(464, 320, 32, 64)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+position = Vector2(0, 1.66893e-06)
+scale = Vector2(0.8, 1.6)
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer2D" parent="."]
+stream = SubResource("AudioStreamRandomizer_frfh3")
+volume_db = -5.0
+autoplay = true
+bus = &"SFX"
+
+[connection signal="body_entered" from="Area2D" to="." method="OnArea2d_BodyEntered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="OnVisibleOnScreenNotifier2d_ScreenExited"]

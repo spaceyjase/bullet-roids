@@ -8,7 +8,6 @@ public partial class Move : PlayerState
   {
     base._Ready();
 
-    OnEnter += () => { };
     OnProcess += DoProcess;
   }
 
@@ -31,7 +30,11 @@ public partial class Move : PlayerState
     if ((movement == Vector2.Zero || (Mathf.IsZeroApprox(movement.X) && Mathf.IsZeroApprox(movement.Y))) &&
         Mathf.IsZeroApprox(rotation))
     {
-      StateMachine?.ChangeState("Idle");
+      StateMachine?.ChangeState(nameof(Idle));
+    }
+    else if (Input.IsActionPressed("shoot"))
+    {
+      StateMachine?.ChangeState(nameof(Shoot));
     }
   }
 }
