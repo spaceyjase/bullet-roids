@@ -32,6 +32,8 @@ public partial class Player : Moveable.Moveable
     base._Ready();
     
     IsActive = true;
+    
+    Position = screenSize / 2;
   }
 
   private void OnArea2d_Area_Entered(Area2D area)

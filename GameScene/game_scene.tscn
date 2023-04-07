@@ -46,7 +46,6 @@ anchor_mode = 0
 zoom = Vector2(0.6, 0.6)
 
 [node name="Player" parent="." instance=ExtResource("1_v3eyx")]
-position = Vector2(576, 400)
 MovementSpeed = 350.0
 RotationSpeed = 5.0
 
