@@ -38,7 +38,7 @@ public partial class PlayerBullet : Node2D
 
   private void OnArea2d_BodyEntered(Node2D body)
   {
-    if (body.IsInGroup("Rocks"))
+    if (body.IsInGroup(nameof(Roid)))
     {
       // TODO: implement this, remove check for "Rocks" group - any body should be able to explode (layers)
       // body as Asteroid.Explode();

@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://8urdypu2l7vh"]
+[gd_scene load_steps=8 format=3 uid="uid://8urdypu2l7vh"]
 
 [ext_resource type="PackedScene" uid="uid://c6j1o3ex8fll4" path="res://Player/player.tscn" id="1_0rsnb"]
 [ext_resource type="Script" path="res://GameManager/GameManager.cs" id="1_dotxi"]
+[ext_resource type="PackedScene" uid="uid://daf17l5byew6k" path="res://Roid/roid.tscn" id="2_qr707"]
 [ext_resource type="Environment" uid="uid://cb5eo2l7jo41" path="res://Shared/world_environment.tres" id="3_xrub7"]
 
 [sub_resource type="Curve" id="Curve_a1q4m"]
@@ -24,8 +25,9 @@ orbit_velocity_max = 0.0
 scale_min = 0.1
 scale_curve = SubResource("CurveTexture_ikrhi")
 
-[node name="GameManager" type="Node2D"]
+[node name="GameManager" type="Node"]
 script = ExtResource("1_dotxi")
+roidScene = ExtResource("2_qr707")
 
 [node name="SpaceParticles" type="GPUParticles2D" parent="."]
 position = Vector2(576, 400)
@@ -42,6 +44,8 @@ zoom = Vector2(0.6, 0.6)
 
 [node name="Player" parent="." instance=ExtResource("1_0rsnb")]
 FireRate = 0.05
+
+[node name="Roids" type="Node" parent="."]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("3_xrub7")

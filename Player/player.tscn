@@ -52,5 +52,5 @@ script = ExtResource("4_6alcx")
 script = ExtResource("7_drdju")
 
 [connection signal="area_entered" from="Area2D" to="." method="OnArea2d_Area_Entered"]
-[connection signal="area_exited" from="Area2D" to="." method="OnArea2d_Area_Exited"]
+[connection signal="body_entered" from="Area2D" to="." method="OnArea2d_Body_Entered"]
 [connection signal="timeout" from="BulletCooldownTimer" to="." method="OnBulletCooldownTimer_Timeout"]

@@ -4,14 +4,7 @@ namespace Moveable;
 
 public partial class Moveable : Node2D
 {
-  private Camera2D camera;
-  protected Vector2 screenSize;
-  
-	public override void _Ready()
-	{
-		camera = GetTree().GetNodesInGroup("Camera")[0] as Camera2D;
-		if (camera is not null) screenSize = camera.GetViewportRect().Size / camera.Zoom;
-	}
+  public Vector2 ScreenSize { get; set; }
 
   public override void _Process(double delta)
   {
@@ -23,23 +16,23 @@ public partial class Moveable : Node2D
   private void ScreenWrapCheck()
   {
     var position = Position;
-    if (position.X > screenSize.X)
+    if (position.X > ScreenSize.X)
     {
       position.X = 0;
     }
 
     if (position.X < 0)
     {
-      position.X = screenSize.X;
+      position.X = ScreenSize.X;
     }
 
-    if (position.Y > screenSize.Y)
+    if (position.Y > ScreenSize.Y)
     {
       position.Y = 0;
     }
     if (position.Y < 0)
     {
-      position.Y = screenSize.Y;
+      position.Y = ScreenSize.Y;
     }
     Position = position;
   }

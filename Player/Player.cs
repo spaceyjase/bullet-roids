@@ -40,8 +40,6 @@ public partial class Player : Moveable.Moveable
 
     IsActive = true;
 
-    Position = screenSize / 2;
-
     bulletCooldownTimer = GetNode<Timer>("BulletCooldownTimer");
     bulletCooldownTimer.WaitTime = FireRate;
 
@@ -50,16 +48,14 @@ public partial class Player : Moveable.Moveable
 
   private void OnArea2d_Area_Entered(Area2D area)
   {
-    // TODO: bullet check, set property if true
-    ++CollisionCount;
+    // TODO: Tot!
     GD.Print($"{area} CollisionCount: {CollisionCount}");
   }
 
-  private void OnArea2d_Area_Exited(Area2D area)
+  private void OnArea2d_Body_Entered(Node body)
   {
-    // TODO: bullet check, set property if true
-    --CollisionCount;
-    GD.Print($"{area} CollisionCount: {CollisionCount}");
+    // TODO: Tot!
+    GD.Print($"{body} CollisionCount: {CollisionCount}");
   }
 
   public bool Colliding => CollisionCount > 0;
