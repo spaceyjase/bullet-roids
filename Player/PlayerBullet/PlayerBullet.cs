@@ -36,13 +36,20 @@ public partial class PlayerBullet : Node2D
     QueueFree();
   }
 
-  private void OnArea2d_BodyEntered(Node2D body)
+  private async void OnArea2d_BodyEntered(Node2D body)
   {
     if (body.IsInGroup(nameof(Roid)))
     {
       // TODO: implement this, remove check for "Rocks" group - any body should be able to explode (layers)
-      // body as Asteroid.Explode();
-      QueueFree();
+      // body as Asteroid.Damage();
+      GD.Print("Hit roid");
     }
+    Visible = false;
+    SetProcess(false);
+    if (audioStreamPlayer.Playing)
+    {
+      await ToSignal(audioStreamPlayer, "finished");
+    }
+    QueueFree();
   }
 }

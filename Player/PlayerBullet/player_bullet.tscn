@@ -1,12 +1,17 @@
-[gd_scene load_steps=6 format=3 uid="uid://q6cjlbo4ve0u"]
+[gd_scene load_steps=8 format=3 uid="uid://q6cjlbo4ve0u"]
 
 [ext_resource type="Script" path="res://Player/PlayerBullet/PlayerBullet.cs" id="1_c7hx0"]
 [ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_me6jl"]
+[ext_resource type="Shader" path="res://Player/PlayerBullet/player_bullet.gdshader" id="2_58ff4"]
 [ext_resource type="AudioStream" uid="uid://fx3n6wqteyxt" path="res://Assets/big one.ogg" id="3_xnj57"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ug60h"]
 radius = 8.0
 height = 32.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xk16r"]
+render_priority = 0
+shader = ExtResource("2_58ff4")
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_frfh3"]
 streams_count = 1
@@ -14,6 +19,7 @@ stream_0/stream = ExtResource("3_xnj57")
 stream_0/weight = 1.0
 
 [node name="PlayerBullet" type="Node2D"]
+modulate = Color(1.5, 1.5, 1.5, 1)
 script = ExtResource("1_c7hx0")
 speed = 1250
 
@@ -25,6 +31,7 @@ collision_mask = 18
 shape = SubResource("CapsuleShape2D_ug60h")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_xk16r")
 scale = Vector2(0.2, 0.5)
 texture = ExtResource("1_me6jl")
 region_enabled = true

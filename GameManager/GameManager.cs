@@ -14,6 +14,7 @@ public partial class GameManager : Node
   private Vector2 screenSize;
   private PathFollow2D roidSpawner;
   private Node roids;
+  private Node bullets;
 
   public override void _Ready()
   {
@@ -22,6 +23,7 @@ public partial class GameManager : Node
     camera = GetTree().GetNodesInGroup("Camera")[0] as Camera2D;
     screenSize = camera!.GetViewportRect().Size / camera.Zoom;
     roids = GetNode<Node>("Roids");
+    bullets = GetNode<Node>("Bullets");
 
     ConfigureRoids();
     ConfigurePlayer();
@@ -88,6 +90,6 @@ public partial class GameManager : Node
   {
     var bulletInstance = bulletScene.Instantiate<PlayerBullet>();
     bulletInstance.Start(position, direction);
-    AddChild(bulletInstance);
+    bullets.AddChild(bulletInstance);
   }
 }
