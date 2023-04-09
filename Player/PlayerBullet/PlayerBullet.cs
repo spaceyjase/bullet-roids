@@ -1,9 +1,14 @@
 using Godot;
+using Roid;
 
 namespace Player.PlayerBullet;
 
 public partial class PlayerBullet : Node2D
 {
+  [Signal]
+  public delegate void BulletHitEventHandler(PackedScene hitParticle, Vector2 position);
+  
+  [Export] private PackedScene hitParticle;
   [Export] private int speed = 1000;
 
   private Vector2 velocity;
@@ -38,14 +43,13 @@ public partial class PlayerBullet : Node2D
 
   private async void OnArea2d_BodyEntered(Node2D body)
   {
-    if (body.IsInGroup(nameof(Roid)))
+    if (body is IDamageable damageable)
     {
-      // TODO: implement this, remove check for "Rocks" group - any body should be able to explode (layers)
-      // body as Asteroid.Damage();
-      GD.Print("Hit roid");
+      damageable.Damage();
     }
     Visible = false;
     SetProcess(false);
+    EmitSignal(SignalName.BulletHit, hitParticle, GlobalPosition);
     if (audioStreamPlayer.Playing)
     {
       await ToSignal(audioStreamPlayer, "finished");

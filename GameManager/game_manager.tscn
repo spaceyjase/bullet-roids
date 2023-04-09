@@ -49,6 +49,8 @@ FireRate = 0.05
 
 [node name="Bullets" type="Node" parent="."]
 
+[node name="Particles" type="Node" parent="."]
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("3_xrub7")
 

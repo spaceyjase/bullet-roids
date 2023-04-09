@@ -13,8 +13,10 @@ public partial class GameManager : Node
   private Player.Player player;
   private Vector2 screenSize;
   private PathFollow2D roidSpawner;
+  
   private Node roids;
   private Node bullets;
+  private Node particles;
 
   public override void _Ready()
   {
@@ -24,6 +26,7 @@ public partial class GameManager : Node
     screenSize = camera!.GetViewportRect().Size / camera.Zoom;
     roids = GetNode<Node>("Roids");
     bullets = GetNode<Node>("Bullets");
+    particles = GetNode<Node>("Particles");
 
     ConfigureRoids();
     ConfigurePlayer();
@@ -53,8 +56,7 @@ public partial class GameManager : Node
     var roid = roidScene.Instantiate<Roid.Roid>();
     roids.AddChild(roid);
     
-    roid.ScreenSize = screenSize;
-    roid.Start(position.Value, velocity.Value, size);
+    roid.Start(screenSize, position.Value, velocity.Value, size);
   }
 
   private void ConfigurePlayer()
@@ -89,7 +91,15 @@ public partial class GameManager : Node
   private void OnPlayer_Shoot(PackedScene bulletScene, Vector2 position, float direction)
   {
     var bulletInstance = bulletScene.Instantiate<PlayerBullet>();
+    bulletInstance.BulletHit += OnBulletHit;
     bulletInstance.Start(position, direction);
     bullets.AddChild(bulletInstance);
+  }
+
+  private void OnBulletHit(PackedScene hitParticle, Vector2 position)
+  {
+    var instance = hitParticle.Instantiate<Node2D>();
+    particles.AddChild(instance);
+    instance.GlobalPosition = position;
   }
 }
