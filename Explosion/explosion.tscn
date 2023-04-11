@@ -79,6 +79,7 @@ _data = {
 }
 
 [node name="Explosion" type="Sprite2D"]
+visible = false
 texture = ExtResource("1_pldxp")
 hframes = 8
 vframes = 8
