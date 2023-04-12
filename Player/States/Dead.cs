@@ -1,5 +1,3 @@
 namespace Player.States;
 
-public partial class Dead : PlayerState
-{
-}
+public partial class Dead : PlayerState { }

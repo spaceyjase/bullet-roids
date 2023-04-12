@@ -1,55 +1,73 @@
+using System.Threading.Tasks;
+using Damageable;
 using Godot;
+using Roid;
 
 namespace Player.PlayerBullet;
 
 public partial class PlayerBullet : Node2D
 {
-  [Export] private int speed = 1000;
+    [Signal]
+    public delegate void BulletHitEventHandler(PackedScene hitParticle, Vector2 position);
 
-  private Vector2 velocity;
-  private AudioStreamPlayer2D audioStreamPlayer;
+    [Export]
+    private PackedScene hitParticle;
 
-  public override void _Ready()
-  {
-    base._Ready();
-    audioStreamPlayer = GetNode<AudioStreamPlayer2D>("AudioStreamPlayer");
-  }
+    [Export]
+    private int speed = 1000;
 
-  public void Start(Vector2 position, float direction)
-  {
-    Position = position;
-    Rotation = direction;
-    velocity = new Vector2(0, -speed).Rotated(direction);
-  }
+    private Vector2 velocity;
+    private AudioStreamPlayer2D audioStreamPlayer;
+    private bool active = true;
 
-  public override void _Process(double delta)
-  {
-    Position += velocity * (float)delta;
-  }
-  
-  private async void OnVisibleOnScreenNotifier2d_ScreenExited()
-  {
-    if (audioStreamPlayer.Playing)
+    public override void _Ready()
     {
-      await ToSignal(audioStreamPlayer, "finished");
+        base._Ready();
+        audioStreamPlayer = GetNode<AudioStreamPlayer2D>("AudioStreamPlayer");
     }
-    QueueFree();
-  }
 
-  private async void OnArea2d_BodyEntered(Node2D body)
-  {
-    if (body.IsInGroup(nameof(Roid)))
+    public void Start(Vector2 position, float direction)
     {
-      // TODO: implement this, remove check for "Rocks" group - any body should be able to explode (layers)
-      // body as Asteroid.Damage();
-      GD.Print("Hit roid");
+        Position = position;
+        Rotation = direction;
+        velocity = new Vector2(0, -speed).Rotated(direction);
     }
-    Visible = false;
-    SetProcess(false);
-    if (audioStreamPlayer.Playing)
+
+    public override void _Process(double delta)
     {
-      await ToSignal(audioStreamPlayer, "finished");
+        Position += velocity * (float)delta;
     }
-    QueueFree();
-  }
+
+    private async void OnVisibleOnScreenNotifier2d_ScreenExited()
+    {
+        if (!active)
+            return;
+        active = false;
+        await AudioCheck();
+        QueueFree();
+    }
+
+    private async Task AudioCheck()
+    {
+        if (audioStreamPlayer.Playing)
+        {
+            await ToSignal(audioStreamPlayer, "finished");
+        }
+    }
+
+    private async void OnArea2d_BodyEntered(Node2D body)
+    {
+        if (!active)
+            return;
+        active = false;
+        if (body is IDamageable damageable)
+        {
+            damageable.Damage();
+        }
+        Visible = false;
+        SetProcess(false);
+        EmitSignal(SignalName.BulletHit, hitParticle, GlobalPosition);
+        await AudioCheck();
+        QueueFree();
+    }
 }

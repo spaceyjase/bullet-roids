@@ -5,94 +5,95 @@ namespace StateMachine;
 
 public partial class StateMachine : Node
 {
-  private readonly Dictionary<string, State> states = new();
+    private readonly Dictionary<string, State> states = new();
 
-  private State CurrentState { get; set; }
-  private State InitialState { get; set; }
+    private State CurrentState { get; set; }
+    private State InitialState { get; set; }
 
-  public override void _Ready()
-  {
-    base._Ready();
-
-    foreach (var child in GetChildren())
+    public override void _Ready()
     {
-      if (!(child is State state)) continue;
-        
-      if (states.Count == 0)
-      {
-        InitialState = state;
-      }
-      states[state.Name] = state;
-      state.StateMachine = this;
-    }
-  }
+        base._Ready();
 
-  public override void _Process(double delta)
-  {
-    base._Process(delta);
+        foreach (var child in GetChildren())
+        {
+            if (!(child is State state))
+                continue;
 
-    if (states.Count == 0 || InitialState == null)
-    {
-      GD.PrintErr("State machine has no states!");
-      return;
+            if (states.Count == 0)
+            {
+                InitialState = state;
+            }
+            states[state.Name] = state;
+            state.StateMachine = this;
+        }
     }
 
-    if (CurrentState == null)
+    public override void _Process(double delta)
     {
-      ChangeState(InitialState);
+        base._Process(delta);
+
+        if (states.Count == 0 || InitialState == null)
+        {
+            GD.PrintErr("State machine has no states!");
+            return;
+        }
+
+        if (CurrentState == null)
+        {
+            ChangeState(InitialState);
+        }
+
+        CurrentState?.OnProcess?.Invoke(delta);
     }
 
-    CurrentState?.OnProcess?.Invoke(delta);
-  }
-
-  public override void _PhysicsProcess(double delta)
-  {
-    base._PhysicsProcess(delta);
-      
-    if (states.Count == 0 || InitialState == null)
+    public override void _PhysicsProcess(double delta)
     {
-      GD.PrintErr("State machine has no states!");
-      return;
+        base._PhysicsProcess(delta);
+
+        if (states.Count == 0 || InitialState == null)
+        {
+            GD.PrintErr("State machine has no states!");
+            return;
+        }
+
+        if (CurrentState == null)
+        {
+            ChangeState(InitialState);
+        }
+
+        CurrentState?.OnPhysicsProcess?.Invoke(delta);
     }
 
-    if (CurrentState == null)
+    private void ChangeState(State newState)
     {
-      ChangeState(InitialState);
+        if (newState == null)
+        {
+            GD.PrintErr("Cannot transition to a null state!");
+            return;
+        }
+
+        CurrentState?.OnExit?.Invoke();
+
+        CurrentState = newState;
+
+        newState.OnEnter?.Invoke();
     }
 
-    CurrentState?.OnPhysicsProcess?.Invoke(delta);
-  }
-
-  private void ChangeState(State newState)
-  {
-    if (newState == null)
+    public void ChangeState(string name)
     {
-      GD.PrintErr("Cannot transition to a null state!");
-      return;
+        if (states.ContainsKey(name) == false)
+        {
+            GD.PrintErr($"State {name} does not exist!");
+            return;
+        }
+
+        ChangeState(states[name]);
     }
 
-    CurrentState?.OnExit?.Invoke();
-
-    CurrentState = newState;
-      
-    newState.OnEnter?.Invoke();
-  }
-    
-  public void ChangeState(string name)
-  {
-    if (states.ContainsKey(name) == false)
+    public override void _UnhandledInput(InputEvent @event)
     {
-      GD.PrintErr($"State {name} does not exist!");
-      return;
+        base._UnhandledInput(@event);
+
+        CurrentState?.OnInput?.Invoke(@event);
     }
-
-    ChangeState(states[name]);
-  }
-
-  public override void _UnhandledInput(InputEvent @event)
-  {
-    base._UnhandledInput(@event);
-
-    CurrentState?.OnInput?.Invoke(@event);
-  }
 }

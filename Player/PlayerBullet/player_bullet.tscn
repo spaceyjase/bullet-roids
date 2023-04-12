@@ -1,8 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://q6cjlbo4ve0u"]
+[gd_scene load_steps=9 format=3 uid="uid://q6cjlbo4ve0u"]
 
 [ext_resource type="Script" path="res://Player/PlayerBullet/PlayerBullet.cs" id="1_c7hx0"]
 [ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_me6jl"]
 [ext_resource type="Shader" path="res://Player/PlayerBullet/player_bullet.gdshader" id="2_58ff4"]
+[ext_resource type="PackedScene" uid="uid://dvt7bfr07ad42" path="res://Player/PlayerBullet/hit_particle.tscn" id="2_fkska"]
 [ext_resource type="AudioStream" uid="uid://fx3n6wqteyxt" path="res://Assets/big one.ogg" id="3_xnj57"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ug60h"]
@@ -21,6 +22,7 @@ stream_0/weight = 1.0
 [node name="PlayerBullet" type="Node2D"]
 modulate = Color(1.5, 1.5, 1.5, 1)
 script = ExtResource("1_c7hx0")
+hitParticle = ExtResource("2_fkska")
 speed = 1250
 
 [node name="Area2D" type="Area2D" parent="."]
