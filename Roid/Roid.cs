@@ -1,19 +1,12 @@
 using Damageable;
 using Godot;
 using Moveable;
+using Shared;
 
 namespace Roid;
 
 public partial class Roid : PhysicsMoveable, IDamageable
 {
-    [Signal]
-    public delegate void ExplodedEventHandler(
-        int size,
-        int radius,
-        Vector2 position,
-        Vector2 linearVelocity
-    );
-
     [Export]
     private int baseHealth = 3;
 
@@ -86,13 +79,24 @@ public partial class Roid : PhysicsMoveable, IDamageable
 
     private void Explode()
     {
-        CollisionLayer = 0;
-        sprite.Hide();
+        explosion.GlobalPosition = GlobalPosition;
+        explosion.TopLevel = true;
         explosionAnimationPlayer.Play("explosion");
 
-        EmitSignal(SignalName.Exploded, size, radius, Position, LinearVelocity);
+        EventBus.Instance.EmitSignal(
+            EventBus.SignalName.RoidExploded,
+            size,
+            radius,
+            Position,
+            LinearVelocity
+        );
 
-        LinearVelocity = Vector2.Zero;
-        AngularVelocity = 0;
+        CollisionLayer = 0;
+        sprite.Hide();
+    }
+
+    private void OnAnimation_Player_Animation_Finished(StringName name)
+    {
+        QueueFree();
     }
 }

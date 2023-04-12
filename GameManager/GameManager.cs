@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Player.PlayerBullet;
+using Shared;
 
 namespace GameManager;
 
@@ -51,10 +52,16 @@ public partial class GameManager : Node
 
         viewport = GetNode<SubViewport>(viewportPath);
 
+        ConfigureEvents();
         ConfigureRoids();
         ConfigurePlayer();
 
         Start();
+    }
+
+    private void ConfigureEvents()
+    {
+        EventBus.Instance.RoidExploded += OnRoid_Exploded;
     }
 
     private void Start()
@@ -78,7 +85,6 @@ public partial class GameManager : Node
             Vector2.Right.Rotated((float)GD.RandRange(0, 2 * Mathf.Pi)) * GD.RandRange(100, 150);
 
         var roid = roidScene.Instantiate<Roid.Roid>();
-        roid.Exploded += OnRoid_Exploded;
         roids.AddChild(roid);
 
         roid.Start(screenSize, position.Value, velocity.Value, size);

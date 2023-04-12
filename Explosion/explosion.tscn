@@ -57,20 +57,6 @@ tracks/1/keys = {
 "update": 1,
 "values": [true]
 }
-tracks/2/type = "method"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath(".")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0.38),
-"transitions": PackedFloat32Array(1),
-"values": [{
-"args": [],
-"method": &"queue_free"
-}]
-}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_b8lyx"]
 _data = {
@@ -80,6 +66,7 @@ _data = {
 
 [node name="Explosion" type="Sprite2D"]
 visible = false
+top_level = true
 texture = ExtResource("1_pldxp")
 hframes = 8
 vframes = 8

@@ -45,3 +45,7 @@ region_enabled = true
 region_rect = Rect2(16, 400, 96, 96)
 
 [node name="Explosion" parent="." instance=ExtResource("4_loj5q")]
+
+[connection signal="animation_finished" from="Explosion/AnimationPlayer" to="." method="OnAnimation_Player_Animation_Finished"]
+
+[editable path="Explosion"]
