@@ -7,7 +7,6 @@ ambient_light_color = Color(0.0666667, 0.105882, 0.141176, 1)
 tonemap_mode = 2
 glow_enabled = true
 glow_intensity = 0.3
-glow_strength = 1.35
 glow_bloom = 0.01
 glow_blend_mode = 1
 adjustment_enabled = true

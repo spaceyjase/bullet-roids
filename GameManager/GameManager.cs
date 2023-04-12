@@ -7,7 +7,19 @@ namespace GameManager;
 public partial class GameManager : Node
 {
     [Export]
+    private NodePath viewportPath;
+
+    [Export]
     private PackedScene roidScene;
+
+    [Export]
+    private NodePath roidParentPath;
+
+    [Export]
+    private NodePath bulletParentPath;
+
+    [Export]
+    private NodePath particleParentPath;
 
     [Export]
     private int initialRoids = 3;
@@ -20,6 +32,7 @@ public partial class GameManager : Node
     private Node roids;
     private Node bullets;
     private Node particles;
+    private SubViewport viewport;
 
     public override void _Ready()
     {
@@ -32,9 +45,11 @@ public partial class GameManager : Node
         }
 
         screenSize = camera!.GetViewportRect().Size / camera.Zoom;
-        roids = GetNode<Node>("Roids");
-        bullets = GetNode<Node>("Bullets");
-        particles = GetNode<Node>("Particles");
+        roids = GetNode<Node>(roidParentPath);
+        bullets = GetNode<Node>(bulletParentPath);
+        particles = GetNode<Node>(particleParentPath);
+
+        viewport = GetNode<SubViewport>(viewportPath);
 
         ConfigureRoids();
         ConfigurePlayer();
@@ -70,7 +85,7 @@ public partial class GameManager : Node
 
     private void ConfigurePlayer()
     {
-        player = GetNode<Player.Player>(nameof(Player));
+        player = viewport.GetNode<Player.Player>(nameof(Player));
         player.ScreenSize = screenSize;
 
         player.Position = screenSize / 2;
@@ -89,7 +104,7 @@ public partial class GameManager : Node
         // Add it to the path
         var path = new Path2D();
         path.Curve = curve;
-        AddChild(path);
+        viewport.AddChild(path);
 
         // And the spawner itself
         roidSpawner = new PathFollow2D();

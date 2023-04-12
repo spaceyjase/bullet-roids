@@ -45,4 +45,3 @@ region_enabled = true
 region_rect = Rect2(16, 400, 96, 96)
 
 [node name="Explosion" parent="." instance=ExtResource("4_loj5q")]
-visible = false
