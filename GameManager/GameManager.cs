@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 using Player.PlayerBullet;
 
@@ -78,9 +79,25 @@ public partial class GameManager : Node
             Vector2.Right.Rotated((float)GD.RandRange(0, 2 * Mathf.Pi)) * GD.RandRange(100, 150);
 
         var roid = roidScene.Instantiate<Roid.Roid>();
+        roid.Exploded += OnRoid_Exploded;
         roids.AddChild(roid);
 
         roid.Start(screenSize, position.Value, velocity.Value, size);
+    }
+
+    private void OnRoid_Exploded(int size, int radius, Vector2 position, Vector2 velocity)
+    {
+        if (size <= 1)
+            return;
+
+        foreach (var offset in new[] { -1, 1 })
+        {
+            var direction = (position - player.Position).Normalized();
+            direction = new Vector2(direction.Y, -direction.X) * offset;
+            var newPosition = position + direction * radius;
+            var newVelocity = direction * velocity.Length() * 1.1f;
+            SpawnRoid(size - 1, newPosition, newVelocity);
+        }
     }
 
     private void ConfigurePlayer()

@@ -59,6 +59,11 @@ public partial class Roid : PhysicsMoveable, IDamageable
 
         health = (int)(baseHealth * startSize);
 
+        CallDeferred(nameof(SetShape), velocity);
+    }
+
+    private void SetShape(Vector2 velocity)
+    {
         var shape = new CircleShape2D();
         shape.Radius = radius;
         GetNode<CollisionShape2D>("CollisionShape2D").Shape = shape;
