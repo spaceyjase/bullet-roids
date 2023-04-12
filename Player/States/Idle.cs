@@ -9,6 +9,10 @@ public partial class Idle : PlayerState
         base._Ready();
 
         OnProcess += DoProcess;
+        OnEnter += () =>
+        {
+            player.IsMoving = false;
+        };
     }
 
     private void DoProcess(double delta)

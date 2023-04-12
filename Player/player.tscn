@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://c6j1o3ex8fll4"]
+[gd_scene load_steps=12 format=3 uid="uid://c6j1o3ex8fll4"]
 
 [ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_13pqw"]
 [ext_resource type="Script" path="res://Player/Player.cs" id="1_bhe4s"]
@@ -7,6 +7,8 @@
 [ext_resource type="Script" path="res://Player/States/Move.cs" id="3_1uwoj"]
 [ext_resource type="Script" path="res://StateMachine/StateMachine.cs" id="3_7cq7a"]
 [ext_resource type="Script" path="res://Player/States/Dead.cs" id="4_6alcx"]
+[ext_resource type="Script" path="res://Player/GhostTrail.cs" id="4_qweqt"]
+[ext_resource type="PackedScene" uid="uid://dqv3e06e4o5kf" path="res://Shared/fading_sprite.tscn" id="5_2rfwl"]
 [ext_resource type="Script" path="res://Player/States/Shoot.cs" id="7_drdju"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lqjmw"]
@@ -17,7 +19,6 @@ script = ExtResource("1_bhe4s")
 BulletScene = ExtResource("2_qgw0c")
 
 [node name="Area2D" type="Area2D" parent="."]
-visible = false
 collision_mask = 22
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
@@ -25,9 +26,15 @@ shape = SubResource("CircleShape2D_lqjmw")
 debug_color = Color(0, 0.6, 0.701961, 0.419608)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+z_index = 1
 texture = ExtResource("1_13pqw")
 region_enabled = true
 region_rect = Rect2(392, 8, 48, 48)
+script = ExtResource("4_qweqt")
+fadingSpriteScene = ExtResource("5_2rfwl")
+
+[node name="Timer" type="Timer" parent="Sprite2D"]
+wait_time = 0.05
 
 [node name="BulletSpawn" type="Node2D" parent="."]
 position = Vector2(0, -40)

@@ -28,6 +28,18 @@ public partial class Player : Moveable.Moveable
     private Node2D bulletSpawn;
     private Timer bulletCooldownTimer;
     private bool canShoot = true;
+    private GhostTrail sprite;
+    private bool isMoving;
+
+    public bool IsMoving
+    {
+        get => isMoving;
+        set
+        {
+            isMoving = value;
+            sprite.IsEmitting = value;
+        }
+    }
 
     private int CollisionCount
     {
@@ -54,6 +66,7 @@ public partial class Player : Moveable.Moveable
         bulletCooldownTimer.WaitTime = FireRate;
 
         bulletSpawn = GetNode<Node2D>("BulletSpawn");
+        sprite = GetNode<GhostTrail>("Sprite2D");
     }
 
     private void OnArea2d_Area_Entered(Area2D area)
@@ -92,6 +105,14 @@ public partial class Player : Moveable.Moveable
 
     public void Move(Vector2 movement, float rotation, double delta)
     {
+        if (Mathf.IsZeroApprox(movement.X) && Mathf.IsZeroApprox(movement.Y))
+        {
+            IsMoving = false;
+        }
+        else if (!IsMoving)
+        {
+            IsMoving = true;
+        }
         Position += movement * MovementSpeed * (float)delta;
         Rotation += rotation * RotationSpeed * (float)delta;
     }

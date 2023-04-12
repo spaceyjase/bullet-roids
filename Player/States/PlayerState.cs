@@ -18,7 +18,6 @@ public partial class PlayerState : State
     {
         if (!player.Colliding)
             return;
-        //if (!(collision.Collider is KinematicBody2D other) || !other.IsInGroup("Enemies")) continue;
 
         StateMachine?.ChangeState("Dead");
     }
