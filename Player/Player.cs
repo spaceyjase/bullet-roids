@@ -127,4 +127,9 @@ public partial class Player : Moveable.Moveable
     {
         CanShoot = true;
     }
+
+    public void Start()
+    {
+        throw new System.NotImplementedException();
+    }
 }

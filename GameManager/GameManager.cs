@@ -2,6 +2,7 @@ using System;
 using Godot;
 using Player.PlayerBullet;
 using Shared;
+using UI;
 
 namespace GameManager;
 
@@ -35,6 +36,22 @@ public partial class GameManager : Node
     private Node particles;
     private SubViewport viewport;
 
+    private int level;
+
+    private int score;
+    private int Score
+    {
+        get => score;
+        set
+        {
+            score = value;
+            EventBus.Instance.EmitSignal(EventBus.SignalName.ScoreUpdated, score);
+        }
+    }
+
+    private bool playing;
+    private HUD hud;
+
     public override void _Ready()
     {
         base._Ready();
@@ -45,10 +62,12 @@ public partial class GameManager : Node
             throw new NullReferenceException("No camera found in group 'Camera'");
         }
 
-        screenSize = camera!.GetViewportRect().Size / camera.Zoom;
+        screenSize = camera.GetViewportRect().Size / camera.Zoom;
         roids = GetNode<Node>(roidParentPath);
         bullets = GetNode<Node>(bulletParentPath);
         particles = GetNode<Node>(particleParentPath);
+        hud = GetNode<HUD>("HUD");
+        hud.StartGame += NewGame;
 
         viewport = GetNode<SubViewport>(viewportPath);
 
@@ -57,6 +76,18 @@ public partial class GameManager : Node
         ConfigurePlayer();
 
         Start();
+    }
+
+    public override void _Process(double delta)
+    {
+        base._Process(delta);
+
+        if (!playing)
+            return;
+        if (roids.GetChildCount() == 0)
+        {
+            NewLevel();
+        }
     }
 
     private void ConfigureEvents()
@@ -69,11 +100,11 @@ public partial class GameManager : Node
         GD.Randomize();
         for (var i = 0; i < initialRoids; ++i)
         {
-            SpawnRoid(initialRoids);
+            SpawnRoid();
         }
     }
 
-    private void SpawnRoid(int size, Vector2? position = null, Vector2? velocity = null)
+    private void SpawnRoid(int size = 3, Vector2? position = null, Vector2? velocity = null)
     {
         if (position is null)
         {
@@ -147,5 +178,37 @@ public partial class GameManager : Node
         var instance = hitParticle.Instantiate<Node2D>();
         particles.AddChild(instance);
         instance.GlobalPosition = position;
+    }
+
+    private async void NewGame()
+    {
+        foreach (var roid in roids.GetChildren())
+        {
+            roid.QueueFree();
+        }
+
+        level = 0;
+        Score = 0;
+        player.Start();
+        hud.ShowMessage("Get Ready!");
+        await ToSignal(hud.MessageTimer, "timeout");
+        playing = true;
+        NewLevel();
+    }
+
+    private void NewLevel()
+    {
+        level += 1;
+        hud.ShowMessage($"Wave {level}");
+        for (var i = 0; i < level; ++i)
+        {
+            SpawnRoid();
+        }
+    }
+
+    private void GameOver()
+    {
+        playing = false;
+        hud.GameOver();
     }
 }

@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://c6j1o3ex8fll4" path="res://Player/player.tscn" id="1_0rsnb"]
 [ext_resource type="Script" path="res://GameManager/GameManager.cs" id="1_dotxi"]
 [ext_resource type="PackedScene" uid="uid://daf17l5byew6k" path="res://Roid/roid.tscn" id="2_qr707"]
-[ext_resource type="FontFile" uid="uid://d3viyulf6e1ml" path="res://Assets/Kenney Blocks.ttf" id="3_5kge4"]
+[ext_resource type="PackedScene" uid="uid://dokqgdrx5pyl6" path="res://UI/hud.tscn" id="3_ktvaq"]
 [ext_resource type="Environment" uid="uid://cb5eo2l7jo41" path="res://Shared/world_environment.tres" id="3_xrub7"]
 
 [sub_resource type="Curve" id="Curve_a1q4m"]
@@ -42,16 +42,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
-[node name="ScoreLabel" type="Label" parent="Background"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 51.0
-grow_horizontal = 2
-theme_override_fonts/font = ExtResource("3_5kge4")
-theme_override_font_sizes/font_size = 32
-text = "0000000000"
-horizontal_alignment = 2
+[node name="HUD" parent="." instance=ExtResource("3_ktvaq")]
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 anchors_preset = 8
@@ -60,7 +51,7 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -576.0
-offset_top = -350.0
+offset_top = -340.0
 offset_right = 576.0
 offset_bottom = 400.0
 grow_horizontal = 2
@@ -72,7 +63,7 @@ stretch = true
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
 handle_input_locally = false
 audio_listener_enable_2d = true
-size = Vector2i(1152, 750)
+size = Vector2i(1152, 740)
 render_target_update_mode = 4
 
 [node name="SpaceParticles" type="GPUParticles2D" parent="SubViewportContainer/SubViewport"]

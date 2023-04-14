@@ -12,5 +12,8 @@ public partial class EventBus : Node
         Vector2 linearVelocity
     );
 
+    [Signal]
+    public delegate void ScoreUpdatedEventHandler(int newScore);
+
     public static EventBus Instance { get; } = new();
 }
