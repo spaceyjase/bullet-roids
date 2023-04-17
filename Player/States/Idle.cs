@@ -20,6 +20,8 @@ public partial class Idle : PlayerState
         if (!player.IsActive)
             return;
 
+        CheckForCollisions();
+
         if (MoveCheck())
         {
             StateMachine?.ChangeState(nameof(Move));

@@ -26,6 +26,9 @@ public partial class GameManager : Node
     [Export]
     private int initialRoids = 3;
 
+    [Export]
+    private int baseScore = 10;
+
     private Camera2D camera;
     private Player.Player player;
     private Vector2 screenSize;
@@ -123,6 +126,7 @@ public partial class GameManager : Node
 
     private void OnRoid_Exploded(int size, int radius, Vector2 position, Vector2 velocity)
     {
+        Score += size * baseScore;
         if (size <= 1)
             return;
 
@@ -140,8 +144,12 @@ public partial class GameManager : Node
     {
         player = viewport.GetNode<Player.Player>(nameof(Player));
         player.ScreenSize = screenSize;
+        player.LivesChanged += OnPlayer_LivesChanged;
+    }
 
-        player.Position = screenSize / 2;
+    private void OnPlayer_LivesChanged(int lives)
+    {
+        PlayerReset();
     }
 
     private void ConfigureRoids()
@@ -186,19 +194,34 @@ public partial class GameManager : Node
         {
             roid.QueueFree();
         }
+        foreach (var bullet in bullets.GetChildren())
+        {
+            bullet.QueueFree();
+        }
+        foreach (var particle in particles.GetChildren())
+        {
+            particle.QueueFree();
+        }
 
         level = 0;
         Score = 0;
+        PlayerReset();
         player.Start();
-        hud.ShowMessage("Get Ready!");
         await ToSignal(hud.MessageTimer, "timeout");
         playing = true;
         NewLevel();
     }
 
+    private void PlayerReset()
+    {
+        player.Position = new Vector2(screenSize.X / 2, screenSize.Y * 0.66f);
+        player.Rotation = 0;
+        hud.ShowMessage("Get Ready!");
+    }
+
     private void NewLevel()
     {
-        level += 1;
+        level++;
         hud.ShowMessage($"Wave {level}");
         for (var i = 0; i < level; ++i)
         {

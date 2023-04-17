@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://c6j1o3ex8fll4"]
+[gd_scene load_steps=19 format=3 uid="uid://c6j1o3ex8fll4"]
 
 [ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_13pqw"]
 [ext_resource type="Script" path="res://Player/Player.cs" id="1_bhe4s"]
@@ -10,9 +10,71 @@
 [ext_resource type="Script" path="res://Player/GhostTrail.cs" id="4_qweqt"]
 [ext_resource type="PackedScene" uid="uid://dqv3e06e4o5kf" path="res://Shared/fading_sprite.tscn" id="5_2rfwl"]
 [ext_resource type="Script" path="res://Player/States/Shoot.cs" id="7_drdju"]
+[ext_resource type="PackedScene" uid="uid://cy72ghwkujhi6" path="res://Explosion/explosion.tscn" id="11_6q6sm"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lqjmw"]
 radius = 7.0
+
+[sub_resource type="Curve" id="Curve_h1qc8"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_wsbba"]
+curve = SubResource("Curve_h1qc8")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_flsf3"]
+lifetime_randomness = 0.25
+particle_flag_disable_z = true
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 5.0
+initial_velocity_max = 500.0
+angular_velocity_min = -720.0
+angular_velocity_max = 720.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+angle_min = -720.0
+angle_max = 720.0
+scale_min = 5.0
+scale_max = 10.0
+scale_curve = SubResource("CurveTexture_wsbba")
+
+[sub_resource type="Animation" id="Animation_pce36"]
+resource_name = "invincible"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:self_modulate")
+tracks/0/interp = 0
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.247059), Color(1, 1, 1, 1), Color(1, 1, 1, 0.247059), Color(1, 1, 1, 1), Color(1, 1, 1, 0.247059), Color(1, 1, 1, 1), Color(1, 1, 1, 0.247059), Color(1, 1, 1, 1), Color(1, 1, 1, 0.247059), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_y7w7x"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_un4f7"]
+_data = {
+"RESET": SubResource("Animation_y7w7x"),
+"invincible": SubResource("Animation_pce36")
+}
 
 [node name="Player" type="Node2D"]
 script = ExtResource("1_bhe4s")
@@ -58,6 +120,32 @@ script = ExtResource("4_6alcx")
 [node name="Shoot" type="Node" parent="StateMachine"]
 script = ExtResource("7_drdju")
 
+[node name="HitParticle" type="GPUParticles2D" parent="."]
+top_level = true
+emitting = false
+amount = 64
+process_material = SubResource("ParticleProcessMaterial_flsf3")
+one_shot = true
+explosiveness = 1.0
+randomness = 1.0
+
+[node name="Explosion" parent="." instance=ExtResource("11_6q6sm")]
+scale = Vector2(2, 2)
+
+[node name="InvincibleTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_un4f7")
+}
+
 [connection signal="area_entered" from="Area2D" to="." method="OnArea2d_Area_Entered"]
+[connection signal="area_exited" from="Area2D" to="." method="OnArea2d_Area_Exited"]
 [connection signal="body_entered" from="Area2D" to="." method="OnArea2d_Body_Entered"]
+[connection signal="body_exited" from="Area2D" to="." method="OnArea2d_Body_Exited"]
 [connection signal="timeout" from="BulletCooldownTimer" to="." method="OnBulletCooldownTimer_Timeout"]
+[connection signal="animation_finished" from="Explosion/AnimationPlayer" to="." method="OnAnimation_Player_Animation_Finished"]
+
+[editable path="Explosion"]

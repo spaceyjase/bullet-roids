@@ -16,7 +16,9 @@ public partial class PlayerState : State
 
     protected void CheckForCollisions()
     {
-        if (!player.Colliding)
+        if (!player.IsColliding)
+            return;
+        if (!player.IsDead)
             return;
 
         StateMachine?.ChangeState("Dead");

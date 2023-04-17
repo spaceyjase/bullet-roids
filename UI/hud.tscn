@@ -51,6 +51,20 @@ theme_override_font_sizes/font_size = 32
 text = "0000000000"
 horizontal_alignment = 2
 
+[node name="Title" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -432.0
+offset_top = 256.0
+offset_right = 432.0
+offset_bottom = 403.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("2_70nku")
+theme_override_font_sizes/font_size = 96
+text = "BULLET-ROIDS"
+horizontal_alignment = 1
+
 [node name="StartButton" type="TextureButton" parent="."]
 anchors_preset = 8
 anchor_left = 0.5
@@ -58,9 +72,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -95.0
-offset_top = -24.5
+offset_top = 53.5
 offset_right = 95.0
-offset_bottom = 24.5
+offset_bottom = 102.5
 grow_horizontal = 2
 grow_vertical = 2
 pivot_offset = Vector2(95, 50)

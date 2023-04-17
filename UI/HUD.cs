@@ -9,13 +9,13 @@ public partial class HUD : CanvasLayer
     [Signal]
     public delegate void StartGameEventHandler();
 
-    private List<TextureRect> lives = new();
+    private readonly List<TextureRect> lives = new();
     private Label messageLabel;
-    private Timer messageTimer;
     private TextureButton startButton;
     private Label scoreLabel;
+    private Label title;
 
-    public Timer MessageTimer => messageTimer;
+    public Timer MessageTimer { get; private set; }
 
     public override void _Ready()
     {
@@ -28,9 +28,10 @@ public partial class HUD : CanvasLayer
             lives.Add(l as TextureRect);
         }
 
+        title = GetNode<Label>("Title");
         messageLabel = GetNode<Label>("MessageLabel");
-        messageTimer = GetNode<Timer>("MessageTimer");
-        messageTimer.Timeout += () =>
+        MessageTimer = GetNode<Timer>("MessageTimer");
+        MessageTimer.Timeout += () =>
         {
             messageLabel.Hide();
             ShowMessage(string.Empty);
@@ -39,6 +40,7 @@ public partial class HUD : CanvasLayer
         startButton.Pressed += () =>
         {
             startButton.Hide();
+            title.Hide();
             EmitSignal(SignalName.StartGame);
         };
         scoreLabel = GetNode<Label>("MarginContainer/HBoxContainer/ScoreLabel");
@@ -62,12 +64,15 @@ public partial class HUD : CanvasLayer
     public void ShowMessage(string message)
     {
         messageLabel.Text = message;
+        messageLabel.Show();
+        MessageTimer.Start();
     }
 
     public async void GameOver()
     {
         ShowMessage("Game Over!");
-        await ToSignal(messageTimer, "timeout");
+        await ToSignal(MessageTimer, "timeout");
         startButton.Show();
+        title.Show();
     }
 }

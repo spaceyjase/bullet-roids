@@ -1,3 +1,4 @@
+using Damageable;
 using Godot;
 
 namespace Player;
@@ -10,6 +11,15 @@ public partial class Player : Moveable.Moveable
         Vector2 position,
         float direction
     );
+
+    [Signal]
+    public delegate void LivesChangedEventHandler(int lives);
+
+    [Signal]
+    public delegate void DeadEventHandler();
+
+    [Export]
+    private int startingLives = 3;
 
     [Export]
     private int MovementSpeed { get; set; } = 350;
@@ -24,12 +34,18 @@ public partial class Player : Moveable.Moveable
     private float FireRate { get; set; } = 0.25f;
 
     private int collisionCount;
-    private bool active;
     private Node2D bulletSpawn;
     private Timer bulletCooldownTimer;
     private bool canShoot = true;
     private GhostTrail sprite;
     private bool isMoving;
+    private int lives;
+    private bool isDead;
+    private bool isInvincible;
+    private Timer invincibleTimer;
+    private Sprite2D explosion;
+    private AnimationPlayer explosionAnimationPlayer;
+    private GpuParticles2D hitParticle;
 
     public bool IsMoving
     {
@@ -46,7 +62,6 @@ public partial class Player : Moveable.Moveable
         get => collisionCount;
         set
         {
-            // clamp to 0
             if (value < 0)
             {
                 value = 0;
@@ -56,42 +71,102 @@ public partial class Player : Moveable.Moveable
         }
     }
 
+    private int Lives
+    {
+        get => lives;
+        set
+        {
+            lives = value;
+            EmitSignal(SignalName.LivesChanged, lives);
+        }
+    }
+
     public override void _Ready()
     {
         base._Ready();
-
-        IsActive = true;
 
         bulletCooldownTimer = GetNode<Timer>("BulletCooldownTimer");
         bulletCooldownTimer.WaitTime = FireRate;
 
         bulletSpawn = GetNode<Node2D>("BulletSpawn");
         sprite = GetNode<GhostTrail>("Sprite2D");
+
+        invincibleTimer = GetNode<Timer>("InvincibleTimer");
+        invincibleTimer.Timeout += () =>
+        {
+            IsActive = true;
+            IsInvincible = false;
+        };
+
+        explosion = GetNode<Sprite2D>("Explosion");
+        explosionAnimationPlayer = explosion.GetNode<AnimationPlayer>("AnimationPlayer");
+
+        hitParticle = GetNode<GpuParticles2D>("HitParticle");
+
+        sprite.Visible = false;
     }
 
-    private void OnArea2d_Area_Entered(Area2D area)
+    private void OnArea2d_Area_Entered(Node area)
     {
-        // TODO: Tot!
-        GD.Print($"{area} CollisionCount: {CollisionCount}");
+        CollisionCount++;
+        HandleCollision(area);
     }
 
     private void OnArea2d_Body_Entered(Node body)
     {
-        // TODO: Tot!
-        GD.Print($"{body} CollisionCount: {CollisionCount}");
+        CollisionCount++;
+        HandleCollision(body);
     }
 
-    public bool Colliding => CollisionCount > 0;
-
-    public bool IsActive
+    private void OnArea2d_Area_Exited(Node area)
     {
-        get => active;
-        private set
+        CollisionCount--;
+        HandleCollision(area);
+    }
+
+    private void OnArea2d_Body_Exited(Node body)
+    {
+        CollisionCount--;
+        HandleCollision(body);
+    }
+
+    private void HandleCollision(Node area)
+    {
+        if (!IsActive)
+            return;
+        if (IsInvincible || CollisionCount <= 0)
+            return;
+        if (area is IDamageable damageable)
         {
-            active = value;
-            Visible = active;
+            damageable.Damage();
+        }
+
+        Explode();
+
+        Lives -= 1;
+        if (Lives <= 0)
+        {
+            IsDead = true;
+        }
+        else
+        {
+            IsInvincible = true;
         }
     }
+
+    private void Explode()
+    {
+        explosion.Show();
+        explosion.GlobalPosition = GlobalPosition;
+        explosionAnimationPlayer.Play("explosion");
+
+        hitParticle.GlobalPosition = GlobalPosition;
+        hitParticle.Emitting = true;
+    }
+
+    public bool IsColliding => CollisionCount > 0;
+
+    public bool IsActive { get; private set; }
 
     public bool CanShoot
     {
@@ -130,6 +205,50 @@ public partial class Player : Moveable.Moveable
 
     public void Start()
     {
-        throw new System.NotImplementedException();
+        sprite.Show();
+        Lives = startingLives;
+        IsActive = true;
+        IsDead = false;
+        IsInvincible = false;
+        IsMoving = false;
+        CollisionCount = 0;
+    }
+
+    public bool IsDead
+    {
+        get => isDead;
+        private set
+        {
+            isDead = value;
+            GetNode<CollisionShape2D>("Area2D/CollisionShape2D")
+                .CallDeferred("set_disabled", value);
+            if (!isDead)
+                return;
+            sprite.Hide();
+            IsActive = false;
+            IsMoving = false;
+            EmitSignal(SignalName.Dead);
+        }
+    }
+
+    private bool IsInvincible
+    {
+        get => isInvincible;
+        set
+        {
+            isInvincible = value;
+            GetNode<CollisionShape2D>("Area2D/CollisionShape2D")
+                .CallDeferred("set_disabled", value);
+            if (!value)
+                return;
+            GetNode<AnimationPlayer>("AnimationPlayer").Play("invincible");
+            IsActive = false;
+            invincibleTimer.Start();
+        }
+    }
+
+    private void OnAnimation_Player_Animation_Finished(StringName name)
+    {
+        explosion.Hide();
     }
 }

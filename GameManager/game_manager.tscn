@@ -91,4 +91,6 @@ FireRate = 0.05
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("3_xrub7")
 
+[connection signal="Dead" from="SubViewportContainer/SubViewport/Player" to="." method="GameOver"]
+[connection signal="LivesChanged" from="SubViewportContainer/SubViewport/Player" to="HUD" method="OnLivesUpdated"]
 [connection signal="Shoot" from="SubViewportContainer/SubViewport/Player" to="." method="OnPlayer_Shoot"]
