@@ -27,6 +27,7 @@ scale_min = 0.1
 scale_curve = SubResource("CurveTexture_ikrhi")
 
 [node name="GameManager" type="Node"]
+process_mode = 3
 script = ExtResource("1_dotxi")
 viewportPath = NodePath("SubViewportContainer/SubViewport")
 roidScene = ExtResource("2_qr707")
@@ -45,6 +46,7 @@ color = Color(0, 0, 0, 1)
 [node name="HUD" parent="." instance=ExtResource("3_ktvaq")]
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+process_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5

@@ -234,4 +234,17 @@ public partial class GameManager : Node
         playing = false;
         hud.GameOver();
     }
+
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        base._UnhandledInput(@event);
+
+        if (!playing)
+            return;
+        if (!@event.IsActionPressed("pause_game"))
+            return;
+
+        GetTree().Paused = !GetTree().Paused;
+        hud.ShowMessage(GetTree().Paused ? "Paused" : string.Empty);
+    }
 }

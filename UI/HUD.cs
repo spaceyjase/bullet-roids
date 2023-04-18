@@ -31,11 +31,7 @@ public partial class HUD : CanvasLayer
         title = GetNode<Label>("Title");
         messageLabel = GetNode<Label>("MessageLabel");
         MessageTimer = GetNode<Timer>("MessageTimer");
-        MessageTimer.Timeout += () =>
-        {
-            messageLabel.Hide();
-            ShowMessage(string.Empty);
-        };
+        MessageTimer.Timeout += ClearMessage;
         startButton = GetNode<TextureButton>("StartButton");
         startButton.Pressed += () =>
         {
@@ -46,6 +42,12 @@ public partial class HUD : CanvasLayer
         scoreLabel = GetNode<Label>("MarginContainer/HBoxContainer/ScoreLabel");
 
         EventBus.Instance.ScoreUpdated += OnScoreUpdated;
+    }
+
+    private void ClearMessage()
+    {
+        messageLabel.Text = string.Empty;
+        messageLabel.Hide();
     }
 
     private void OnScoreUpdated(int newScore)
@@ -63,6 +65,12 @@ public partial class HUD : CanvasLayer
 
     public void ShowMessage(string message)
     {
+        if (string.IsNullOrEmpty(message))
+        {
+            ClearMessage();
+            return;
+        }
+
         messageLabel.Text = message;
         messageLabel.Show();
         MessageTimer.Start();
