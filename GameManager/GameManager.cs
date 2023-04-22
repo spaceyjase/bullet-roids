@@ -111,7 +111,7 @@ public partial class GameManager : Node
     {
         if (position is null)
         {
-            roidSpawner.HOffset = GD.Randi();
+            roidSpawner.Progress = GD.Randi();
             position = roidSpawner.Position;
         }
 
