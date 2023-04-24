@@ -54,6 +54,10 @@ public partial class GameManager : Node
 
     private bool playing;
     private HUD hud;
+    private AudioStreamPlayer levelUpSound;
+    private AudioStreamPlayer backgroundMusic;
+    private AudioStreamPlayer readyPlayer;
+    private AudioStreamPlayer gameOverPlayer;
 
     public override void _Ready()
     {
@@ -71,6 +75,11 @@ public partial class GameManager : Node
         particles = GetNode<Node>(particleParentPath);
         hud = GetNode<HUD>("HUD");
         hud.StartGame += NewGame;
+
+        levelUpSound = GetNode<AudioStreamPlayer>("LevelUpSound");
+        backgroundMusic = GetNode<AudioStreamPlayer>("BackgroundMusic");
+        readyPlayer = GetNode<AudioStreamPlayer>("ReadyPlayer");
+        gameOverPlayer = GetNode<AudioStreamPlayer>("GameOverPlayer");
 
         viewport = GetNode<SubViewport>(viewportPath);
 
@@ -149,7 +158,8 @@ public partial class GameManager : Node
 
     private void OnPlayer_LivesChanged(int lives)
     {
-        PlayerReset();
+        if (lives > 0)
+            PlayerReset();
     }
 
     private void ConfigureRoids()
@@ -209,6 +219,7 @@ public partial class GameManager : Node
         player.Start();
         await ToSignal(hud.MessageTimer, "timeout");
         playing = true;
+        backgroundMusic.Play();
         NewLevel();
     }
 
@@ -216,7 +227,8 @@ public partial class GameManager : Node
     {
         player.Position = new Vector2(screenSize.X / 2, screenSize.Y * 0.66f);
         player.Rotation = 0;
-        hud.ShowMessage("Get Ready!");
+        hud.ShowMessage("Ready!");
+        readyPlayer.Play();
     }
 
     private void NewLevel()
@@ -227,12 +239,15 @@ public partial class GameManager : Node
         {
             SpawnRoid();
         }
+        levelUpSound.Play();
     }
 
     private void GameOver()
     {
         playing = false;
+        backgroundMusic.Stop();
         hud.GameOver();
+        gameOverPlayer.Play();
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -245,6 +260,7 @@ public partial class GameManager : Node
             return;
 
         GetTree().Paused = !GetTree().Paused;
+        backgroundMusic.StreamPaused = GetTree().Paused;
         hud.ShowMessage(GetTree().Paused ? "Paused" : string.Empty);
     }
 }

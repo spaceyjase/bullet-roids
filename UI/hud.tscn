@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dokqgdrx5pyl6"]
+[gd_scene load_steps=10 format=3 uid="uid://dokqgdrx5pyl6"]
 
 [ext_resource type="Script" path="res://UI/HUD.cs" id="1_ddo0s"]
 [ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_jo017"]
@@ -9,6 +9,18 @@
 [sub_resource type="AtlasTexture" id="AtlasTexture_kqym2"]
 atlas = ExtResource("1_jo017")
 region = Rect2(392, 8, 48, 48)
+
+[sub_resource type="InputEventKey" id="InputEventKey_kqwre"]
+device = -1
+pressed = true
+keycode = 4194309
+
+[sub_resource type="InputEventAction" id="InputEventAction_0bbe3"]
+action = &"pause_game"
+pressed = true
+
+[sub_resource type="Shortcut" id="Shortcut_rvh8x"]
+events = [SubResource("InputEventKey_kqwre"), SubResource("InputEventAction_0bbe3")]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_ddo0s")
@@ -78,6 +90,7 @@ offset_bottom = 102.5
 grow_horizontal = 2
 grow_vertical = 2
 pivot_offset = Vector2(95, 50)
+shortcut = SubResource("Shortcut_rvh8x")
 texture_normal = ExtResource("3_cas87")
 texture_hover = ExtResource("4_78kv2")
 

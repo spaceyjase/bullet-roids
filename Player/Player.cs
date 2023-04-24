@@ -46,6 +46,7 @@ public partial class Player : Moveable.Moveable
     private Sprite2D explosion;
     private AnimationPlayer explosionAnimationPlayer;
     private GpuParticles2D hitParticle;
+    private AudioStreamPlayer engineSound;
 
     public bool IsMoving
     {
@@ -104,6 +105,8 @@ public partial class Player : Moveable.Moveable
         hitParticle = GetNode<GpuParticles2D>("HitParticle");
 
         sprite.Visible = false;
+
+        engineSound = GetNode<AudioStreamPlayer>("EngineSound");
     }
 
     private void OnArea2d_Area_Entered(Node area)
@@ -156,6 +159,7 @@ public partial class Player : Moveable.Moveable
 
     private void Explode()
     {
+        engineSound.Stop();
         explosion.Show();
         explosion.GlobalPosition = GlobalPosition;
         explosionAnimationPlayer.Play("explosion");
@@ -183,10 +187,15 @@ public partial class Player : Moveable.Moveable
         if (Mathf.IsZeroApprox(movement.X) && Mathf.IsZeroApprox(movement.Y))
         {
             IsMoving = false;
+            engineSound.Stop();
         }
         else if (!IsMoving)
         {
             IsMoving = true;
+            if (!engineSound.Playing)
+            {
+                engineSound.Play();
+            }
         }
         Position += movement * MovementSpeed * (float)delta;
         Rotation += rotation * RotationSpeed * (float)delta;

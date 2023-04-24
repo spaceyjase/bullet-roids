@@ -27,6 +27,7 @@ public partial class Roid : PhysicsMoveable, IDamageable
     private int health;
     private Sprite2D explosion;
     private AnimationPlayer explosionAnimationPlayer;
+    private AudioStreamPlayer2D collisionPlayer;
 
     public override void _Ready()
     {
@@ -38,6 +39,13 @@ public partial class Roid : PhysicsMoveable, IDamageable
 
         explosion = GetNode<Sprite2D>("Explosion");
         explosionAnimationPlayer = explosion.GetNode<AnimationPlayer>("AnimationPlayer");
+
+        collisionPlayer = GetNode<AudioStreamPlayer2D>("CollisionPlayer");
+        BodyEntered += body =>
+        {
+            if (body is Roid && !collisionPlayer.Playing)
+                collisionPlayer.Play();
+        };
     }
 
     public void Start(Vector2 screenSize, Vector2 position, Vector2 velocity, float startSize)

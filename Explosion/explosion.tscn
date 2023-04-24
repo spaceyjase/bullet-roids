@@ -1,6 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://cy72ghwkujhi6"]
+[gd_scene load_steps=7 format=3 uid="uid://cy72ghwkujhi6"]
 
 [ext_resource type="Texture2D" uid="uid://kkjk86ft5466" path="res://Assets/explosion_200x200px.png" id="1_pldxp"]
+[ext_resource type="AudioStream" uid="uid://qeo8mhsc38ca" path="res://Assets/synthetic_thunder_short.wav" id="2_ydhiq"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_yt3se"]
+streams_count = 1
+stream_0/stream = ExtResource("2_ydhiq")
+stream_0/weight = 1.0
 
 [sub_resource type="Animation" id="Animation_3cplb"]
 length = 0.001
@@ -23,6 +29,18 @@ tracks/1/path = NodePath(".:visible")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("ExplodeSound:playing")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
@@ -57,6 +75,18 @@ tracks/1/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("ExplodeSound:playing")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_b8lyx"]
 _data = {
@@ -71,6 +101,10 @@ texture = ExtResource("1_pldxp")
 hframes = 8
 vframes = 8
 region_rect = Rect2(24, 24, 56, 56)
+
+[node name="ExplodeSound" type="AudioStreamPlayer2D" parent="."]
+stream = SubResource("AudioStreamRandomizer_yt3se")
+volume_db = 2.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
