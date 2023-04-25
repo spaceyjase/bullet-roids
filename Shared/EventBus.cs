@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿using System;
+using Godot;
 
 namespace Shared;
 
@@ -14,6 +15,9 @@ public partial class EventBus : Node
 
     [Signal]
     public delegate void ScoreUpdatedEventHandler(int newScore);
+
+    [Signal]
+    public delegate void ImpactEventEventHandler(float intensity);
 
     public static EventBus Instance { get; } = new();
 }

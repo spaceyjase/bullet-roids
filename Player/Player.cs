@@ -1,5 +1,6 @@
 using Damageable;
 using Godot;
+using Shared;
 
 namespace Player;
 
@@ -163,6 +164,7 @@ public partial class Player : Moveable.Moveable
         explosion.Show();
         explosion.GlobalPosition = GlobalPosition;
         explosionAnimationPlayer.Play("explosion");
+        EventBus.Instance.EmitSignal(EventBus.SignalName.ImpactEvent, 1);
 
         hitParticle.GlobalPosition = GlobalPosition;
         hitParticle.Emitting = true;

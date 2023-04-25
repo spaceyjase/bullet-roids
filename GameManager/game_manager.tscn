@@ -1,10 +1,13 @@
-[gd_scene load_steps=14 format=3 uid="uid://8urdypu2l7vh"]
+[gd_scene load_steps=17 format=3 uid="uid://8urdypu2l7vh"]
 
 [ext_resource type="PackedScene" uid="uid://c6j1o3ex8fll4" path="res://Player/player.tscn" id="1_0rsnb"]
 [ext_resource type="Script" path="res://GameManager/GameManager.cs" id="1_dotxi"]
 [ext_resource type="PackedScene" uid="uid://daf17l5byew6k" path="res://Roid/roid.tscn" id="2_qr707"]
+[ext_resource type="Script" path="res://Shared/EffectsManager.cs" id="3_8ba77"]
 [ext_resource type="PackedScene" uid="uid://dokqgdrx5pyl6" path="res://UI/hud.tscn" id="3_ktvaq"]
 [ext_resource type="Environment" uid="uid://cb5eo2l7jo41" path="res://Shared/world_environment.tres" id="3_xrub7"]
+[ext_resource type="Script" path="res://Camera/CameraShake.cs" id="4_yx7fg"]
+[ext_resource type="FastNoiseLite" uid="uid://qt8ccudr33cu" path="res://Shared/noise_resource.tres" id="5_4tciw"]
 [ext_resource type="AudioStream" uid="uid://julx8voig557" path="res://Assets/flying_spaceship.ogg" id="6_uf4pt"]
 [ext_resource type="AudioStream" uid="uid://3ltrh33lccd3" path="res://Assets/Game Starting 1.wav" id="7_1kr4g"]
 [ext_resource type="AudioStream" uid="uid://bupcg3cyiw3re" path="res://Assets/Chipster1.ogg" id="8_qcfpf"]
@@ -39,6 +42,9 @@ roidScene = ExtResource("2_qr707")
 roidParentPath = NodePath("SubViewportContainer/SubViewport/Roids")
 bulletParentPath = NodePath("SubViewportContainer/SubViewport/Bullets")
 particleParentPath = NodePath("SubViewportContainer/SubViewport/Particles")
+
+[node name="EffectsManager" type="Node" parent="."]
+script = ExtResource("3_8ba77")
 
 [node name="Background" type="ColorRect" parent="."]
 anchors_preset = 15
@@ -85,6 +91,9 @@ local_coords = true
 [node name="Camera2D" type="Camera2D" parent="SubViewportContainer/SubViewport" groups=["Camera"]]
 anchor_mode = 0
 zoom = Vector2(0.6, 0.6)
+script = ExtResource("4_yx7fg")
+maxAmplitude = 50.0
+noiseResource = ExtResource("5_4tciw")
 
 [node name="Player" parent="SubViewportContainer/SubViewport" instance=ExtResource("1_0rsnb")]
 FireRate = 0.05

@@ -135,6 +135,8 @@ public partial class GameManager : Node
 
     private void OnRoid_Exploded(int size, int radius, Vector2 position, Vector2 velocity)
     {
+        EventBus.Instance.EmitSignal(EventBus.SignalName.ImpactEvent, 0.5);
+
         Score += size * baseScore;
         if (size <= 1)
             return;
@@ -158,8 +160,11 @@ public partial class GameManager : Node
 
     private void OnPlayer_LivesChanged(int lives)
     {
-        if (lives > 0)
-            PlayerReset();
+        if (lives <= 0 || !playing)
+            return;
+
+        EventBus.Instance.EmitSignal(EventBus.SignalName.ImpactEvent, 2);
+        PlayerReset();
     }
 
     private void ConfigureRoids()
