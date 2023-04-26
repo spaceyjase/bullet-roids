@@ -13,7 +13,7 @@ config_version=5
 config/name="bullet-roids"
 run/main_scene="res://GameManager/game_manager.tscn"
 config/features=PackedStringArray("4.0", "C#", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://icon.png"
 
 [display]
 
@@ -81,7 +81,7 @@ pause_game={
 
 2d_physics/layer_1="Player"
 2d_physics/layer_2="Enemies"
-2d_physics/layer_3="Bullets"
+2d_physics/layer_3="EnemyBullets"
 2d_physics/layer_4="PlayerBullets"
 2d_physics/layer_5="Asteroids"
 

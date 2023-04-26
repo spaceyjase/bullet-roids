@@ -28,6 +28,7 @@ speed = 1250
 [node name="Area2D" type="Area2D" parent="."]
 collision_layer = 8
 collision_mask = 18
+monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CapsuleShape2D_ug60h")
@@ -49,5 +50,6 @@ volume_db = -5.0
 autoplay = true
 bus = &"SFX"
 
+[connection signal="area_entered" from="Area2D" to="." method="OnArea2d_AreaEntered"]
 [connection signal="body_entered" from="Area2D" to="." method="OnArea2d_BodyEntered"]
 [connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="OnVisibleOnScreenNotifier2d_ScreenExited"]

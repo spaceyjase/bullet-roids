@@ -1,6 +1,5 @@
 using System;
 using Godot;
-using Player.PlayerBullet;
 using Shared;
 using UI;
 
@@ -15,7 +14,13 @@ public partial class GameManager : Node
     private PackedScene roidScene;
 
     [Export]
+    private PackedScene enemyScene;
+
+    [Export]
     private NodePath roidParentPath;
+
+    [Export]
+    private NodePath enemyParentPath;
 
     [Export]
     private NodePath bulletParentPath;
@@ -27,7 +32,15 @@ public partial class GameManager : Node
     private int initialRoids = 3;
 
     [Export]
+    private int enemySpawnLevel = 3;
+
+    [Export]
     private int baseScore = 10;
+
+    [Export]
+    private int maxRoidSize = 5;
+
+    private const int minRoidSize = 3;
 
     private Camera2D camera;
     private Player.Player player;
@@ -35,6 +48,7 @@ public partial class GameManager : Node
     private PathFollow2D roidSpawner;
 
     private Node roids;
+    private Node enemies;
     private Node bullets;
     private Node particles;
     private SubViewport viewport;
@@ -58,6 +72,7 @@ public partial class GameManager : Node
     private AudioStreamPlayer backgroundMusic;
     private AudioStreamPlayer readyPlayer;
     private AudioStreamPlayer gameOverPlayer;
+    private Timer enemyTimer;
 
     public override void _Ready()
     {
@@ -71,6 +86,7 @@ public partial class GameManager : Node
 
         screenSize = camera.GetViewportRect().Size / camera.Zoom;
         roids = GetNode<Node>(roidParentPath);
+        enemies = GetNode<Node>(enemyParentPath);
         bullets = GetNode<Node>(bulletParentPath);
         particles = GetNode<Node>(particleParentPath);
         hud = GetNode<HUD>("HUD");
@@ -81,6 +97,9 @@ public partial class GameManager : Node
         readyPlayer = GetNode<AudioStreamPlayer>("ReadyPlayer");
         gameOverPlayer = GetNode<AudioStreamPlayer>("GameOverPlayer");
 
+        enemyTimer = GetNode<Timer>("EnemyTimer");
+        enemyTimer.Timeout += SpawnEnemy;
+
         viewport = GetNode<SubViewport>(viewportPath);
 
         ConfigureEvents();
@@ -88,6 +107,15 @@ public partial class GameManager : Node
         ConfigurePlayer();
 
         Start();
+    }
+
+    private void SpawnEnemy()
+    {
+        var enemy = enemyScene.Instantiate<Enemy.Enemy>();
+        enemies.AddChild(enemy);
+        enemy.Target = player;
+        enemyTimer.WaitTime = GD.RandRange(20, 40); // TODO: balance, tougher enemies later?
+        enemyTimer.Start();
     }
 
     public override void _Process(double delta)
@@ -105,6 +133,15 @@ public partial class GameManager : Node
     private void ConfigureEvents()
     {
         EventBus.Instance.RoidExploded += OnRoid_Exploded;
+        EventBus.Instance.EnemyExploded += OnEnemy_Exploded;
+        EventBus.Instance.BulletHit += OnBulletHit;
+        EventBus.Instance.Shoot += OnShoot;
+    }
+
+    private void OnEnemy_Exploded(int enemyScore, Vector2 position)
+    {
+        EventBus.Instance.EmitSignal(EventBus.SignalName.ImpactEvent, 0.5);
+        Score += enemyScore * baseScore;
     }
 
     private void Start()
@@ -116,7 +153,11 @@ public partial class GameManager : Node
         }
     }
 
-    private void SpawnRoid(int size = 3, Vector2? position = null, Vector2? velocity = null)
+    private void SpawnRoid(
+        int size = minRoidSize,
+        Vector2? position = null,
+        Vector2? velocity = null
+    )
     {
         if (position is null)
         {
@@ -188,10 +229,9 @@ public partial class GameManager : Node
         path.AddChild(roidSpawner);
     }
 
-    private void OnPlayer_Shoot(PackedScene bulletScene, Vector2 position, float direction)
+    private void OnShoot(PackedScene bulletScene, Vector2 position, float direction)
     {
-        var bulletInstance = bulletScene.Instantiate<PlayerBullet>();
-        bulletInstance.BulletHit += OnBulletHit;
+        var bulletInstance = bulletScene.Instantiate<BaseBullet>();
         bulletInstance.Start(position, direction);
         bullets.AddChild(bulletInstance);
     }
@@ -217,6 +257,10 @@ public partial class GameManager : Node
         {
             particle.QueueFree();
         }
+        foreach (var enemy in enemies.GetChildren())
+        {
+            enemy.QueueFree();
+        }
 
         level = 0;
         Score = 0;
@@ -238,21 +282,40 @@ public partial class GameManager : Node
 
     private void NewLevel()
     {
+        DestroyEnemies();
+
         level++;
         hud.ShowMessage($"Wave {level}");
         for (var i = 0; i < level; ++i)
         {
-            SpawnRoid();
+            var size = minRoidSize;
+            if (level > minRoidSize)
+            {
+                size = GD.RandRange(minRoidSize, level);
+                size = Mathf.Clamp(size, minRoidSize, maxRoidSize);
+            }
+            SpawnRoid(size);
         }
         levelUpSound.Play();
+        if (level <= enemySpawnLevel)
+            return;
+        enemyTimer.WaitTime = GD.RandRange(5, 10);
+        enemyTimer.Start();
+    }
+
+    private void DestroyEnemies()
+    {
+        GetTree().CallGroup("enemies", "Explode");
     }
 
     private void GameOver()
     {
         playing = false;
         backgroundMusic.Stop();
+        enemyTimer.Stop();
         hud.GameOver();
         gameOverPlayer.Play();
+        GetTree().CallGroup("enemies", "GameOver");
     }
 
     public override void _UnhandledInput(InputEvent @event)

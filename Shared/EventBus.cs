@@ -14,6 +14,19 @@ public partial class EventBus : Node
     );
 
     [Signal]
+    public delegate void ShootEventHandler(
+        PackedScene bulletScene,
+        Vector2 position,
+        float direction
+    );
+
+    [Signal]
+    public delegate void BulletHitEventHandler(PackedScene hitParticle, Vector2 position);
+
+    [Signal]
+    public delegate void EnemyExplodedEventHandler(int score, Vector2 position);
+
+    [Signal]
     public delegate void ScoreUpdatedEventHandler(int newScore);
 
     [Signal]

@@ -1,0 +1,46 @@
+[gd_scene load_steps=7 format=3 uid="uid://bdxn0xl05dmoy"]
+
+[ext_resource type="Script" path="res://Enemy/Bullet/EnemyBullet.cs" id="1_le86g"]
+[ext_resource type="PackedScene" uid="uid://wen0kbupi7ky" path="res://Enemy/Bullet/enemy_hit_particle.tscn" id="2_0dclc"]
+[ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="4_4rpvt"]
+[ext_resource type="AudioStream" uid="uid://fx3n6wqteyxt" path="res://Assets/big one.ogg" id="5_d8swa"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ug60h"]
+radius = 8.0
+height = 32.0
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_frfh3"]
+streams_count = 1
+stream_0/stream = ExtResource("5_d8swa")
+stream_0/weight = 1.0
+
+[node name="EnemyBullet" type="Node2D"]
+modulate = Color(1.5, 1.5, 1.5, 1)
+script = ExtResource("1_le86g")
+speed = 950
+hitParticle = ExtResource("2_0dclc")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 17
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CapsuleShape2D_ug60h")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.2, 0.5)
+texture = ExtResource("4_4rpvt")
+region_enabled = true
+region_rect = Rect2(400.387, 320.904, 31.613, 63.096)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+position = Vector2(0, 1.66893e-06)
+scale = Vector2(0.8, 1.6)
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer2D" parent="."]
+stream = SubResource("AudioStreamRandomizer_frfh3")
+volume_db = -5.0
+autoplay = true
+bus = &"SFX"
+
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="OnVisibleOnScreenNotifier2d_ScreenExited"]

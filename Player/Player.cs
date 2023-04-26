@@ -7,13 +7,6 @@ namespace Player;
 public partial class Player : Moveable.Moveable
 {
     [Signal]
-    public delegate void ShootEventHandler(
-        PackedScene bulletScene,
-        Vector2 position,
-        float direction
-    );
-
-    [Signal]
     public delegate void LivesChangedEventHandler(int lives);
 
     [Signal]
@@ -205,7 +198,12 @@ public partial class Player : Moveable.Moveable
 
     public void Fire()
     {
-        EmitSignal(SignalName.Shoot, BulletScene, bulletSpawn.GlobalPosition, Rotation);
+        EventBus.Instance.EmitSignal(
+            EventBus.SignalName.Shoot,
+            BulletScene,
+            bulletSpawn.GlobalPosition,
+            Rotation
+        );
         CanShoot = false;
     }
 
