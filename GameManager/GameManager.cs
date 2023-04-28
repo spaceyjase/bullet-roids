@@ -17,6 +17,9 @@ public partial class GameManager : Node
     private PackedScene enemyScene;
 
     [Export]
+    private PackedScene burstScene;
+
+    [Export]
     private NodePath roidParentPath;
 
     [Export]
@@ -28,6 +31,7 @@ public partial class GameManager : Node
     [Export]
     private NodePath particleParentPath;
 
+    [ExportCategory("Game Configuration")]
     [Export]
     private int initialRoids = 3;
 
@@ -36,6 +40,9 @@ public partial class GameManager : Node
 
     [Export]
     private uint baseScore = 10;
+
+    [Export]
+    private uint spawnBurstLevel = 5;
 
     private const uint minRoidSize = 3;
     private const uint maxRoidSize = 5;
@@ -243,7 +250,14 @@ public partial class GameManager : Node
 
         Score += baseScore * size;
         if (size <= 1)
+        {
+            if (level > spawnBurstLevel)
+            {
+                CallDeferred(nameof(SpawnBurst), position);
+            }
+
             return;
+        }
 
         foreach (var offset in new[] { -1, 1 })
         {
@@ -253,6 +267,13 @@ public partial class GameManager : Node
             var newVelocity = direction * velocity.Length() * 1.1f;
             SpawnRoid(size - 1, newPosition, newVelocity);
         }
+    }
+
+    private void SpawnBurst(Vector2 position)
+    {
+        var burst = burstScene.Instantiate<Burst>();
+        enemies.AddChild(burst);
+        burst.Start(position);
     }
 
     private void ConfigurePlayer()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://8urdypu2l7vh"]
+[gd_scene load_steps=22 format=3 uid="uid://8urdypu2l7vh"]
 
 [ext_resource type="PackedScene" uid="uid://c6j1o3ex8fll4" path="res://Player/player.tscn" id="1_0rsnb"]
 [ext_resource type="Script" path="res://GameManager/GameManager.cs" id="1_dotxi"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bkjs3ty1t8brx" path="res://Enemy/enemy.tscn" id="3_c6bey"]
 [ext_resource type="PackedScene" uid="uid://dokqgdrx5pyl6" path="res://UI/hud.tscn" id="3_ktvaq"]
 [ext_resource type="Environment" uid="uid://cb5eo2l7jo41" path="res://Shared/world_environment.tres" id="3_xrub7"]
+[ext_resource type="PackedScene" uid="uid://byxpfqp8c7d8a" path="res://Burst/burst.tscn" id="4_qg5kj"]
 [ext_resource type="Script" path="res://Camera/CameraShake.cs" id="4_yx7fg"]
 [ext_resource type="FastNoiseLite" uid="uid://qt8ccudr33cu" path="res://Shared/noise_resource.tres" id="5_4tciw"]
 [ext_resource type="AudioStream" uid="uid://julx8voig557" path="res://Assets/flying_spaceship.ogg" id="6_uf4pt"]
@@ -78,6 +79,7 @@ script = ExtResource("1_dotxi")
 viewportPath = NodePath("SubViewportContainer/SubViewport")
 roidScene = ExtResource("2_qr707")
 enemyScene = ExtResource("3_c6bey")
+burstScene = ExtResource("4_qg5kj")
 roidParentPath = NodePath("SubViewportContainer/SubViewport/Roids")
 enemyParentPath = NodePath("SubViewportContainer/SubViewport/Enemies")
 bulletParentPath = NodePath("SubViewportContainer/SubViewport/Bullets")
