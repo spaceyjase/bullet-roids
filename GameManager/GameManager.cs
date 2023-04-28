@@ -35,12 +35,12 @@ public partial class GameManager : Node
     private int enemySpawnLevel = 3;
 
     [Export]
-    private int baseScore = 10;
+    private uint baseScore = 10;
 
-    [Export]
-    private int maxRoidSize = 5;
-
-    private const int minRoidSize = 3;
+    private const uint minRoidSize = 3;
+    private const uint maxRoidSize = 5;
+    private const uint defaultHighScore = 100;
+    private const string gameDataPath = "user://game.data";
 
     private Camera2D camera;
     private Player.Player player;
@@ -53,16 +53,31 @@ public partial class GameManager : Node
     private Node particles;
     private SubViewport viewport;
 
-    private int level;
+    private uint level;
 
-    private int score;
-    private int Score
+    private uint highScore;
+    private uint HighScore
+    {
+        get => highScore;
+        set
+        {
+            highScore = value;
+            EventBus.Instance.EmitSignal(EventBus.SignalName.HighScoreUpdated, highScore);
+            data[nameof(highScore)] = highScore;
+        }
+    }
+
+    private uint score;
+    private uint Score
     {
         get => score;
         set
         {
             score = value;
             EventBus.Instance.EmitSignal(EventBus.SignalName.ScoreUpdated, score);
+            if (score <= HighScore)
+                return;
+            HighScore = score;
         }
     }
 
@@ -73,6 +88,7 @@ public partial class GameManager : Node
     private AudioStreamPlayer readyPlayer;
     private AudioStreamPlayer gameOverPlayer;
     private Timer enemyTimer;
+    private Godot.Collections.Dictionary<string, Variant> data = new();
 
     public override void _Ready()
     {
@@ -85,28 +101,72 @@ public partial class GameManager : Node
         }
 
         screenSize = camera.GetViewportRect().Size / camera.Zoom;
+
+        ConfigureChildNodes();
+        ConfigureAudio();
+        ConfigureEvents();
+        ConfigureRoids();
+        ConfigurePlayer();
+
+        LoadGameData();
+
+        Start();
+    }
+
+    private void LoadGameData()
+    {
+        if (!FileAccess.FileExists(gameDataPath))
+        {
+            CreateDefaultGameData();
+            return;
+        }
+
+        using var file = FileAccess.Open(gameDataPath, FileAccess.ModeFlags.Read);
+        var jsonString = file.GetLine();
+        var json = new Json();
+        var parseResult = json.Parse(jsonString);
+        if (parseResult != Error.Ok)
+        {
+            CreateDefaultGameData();
+            return;
+        }
+
+        data = new Godot.Collections.Dictionary<string, Variant>(
+            (Godot.Collections.Dictionary)json.Data
+        );
+        HighScore = data[nameof(highScore)].AsUInt32();
+    }
+
+    private void CreateDefaultGameData()
+    {
+        HighScore = defaultHighScore;
+        data[nameof(highScore)] = highScore;
+        SaveGameData();
+    }
+
+    private void SaveGameData()
+    {
+        using var file = FileAccess.Open(gameDataPath, FileAccess.ModeFlags.Write);
+        file.StoreLine(Json.Stringify(data));
+    }
+
+    private void ConfigureChildNodes()
+    {
         roids = GetNode<Node>(roidParentPath);
         enemies = GetNode<Node>(enemyParentPath);
         bullets = GetNode<Node>(bulletParentPath);
         particles = GetNode<Node>(particleParentPath);
         hud = GetNode<HUD>("HUD");
-        hud.StartGame += NewGame;
+        enemyTimer = GetNode<Timer>("EnemyTimer");
+        viewport = GetNode<SubViewport>(viewportPath);
+    }
 
+    private void ConfigureAudio()
+    {
         levelUpSound = GetNode<AudioStreamPlayer>("LevelUpSound");
         backgroundMusic = GetNode<AudioStreamPlayer>("BackgroundMusic");
         readyPlayer = GetNode<AudioStreamPlayer>("ReadyPlayer");
         gameOverPlayer = GetNode<AudioStreamPlayer>("GameOverPlayer");
-
-        enemyTimer = GetNode<Timer>("EnemyTimer");
-        enemyTimer.Timeout += SpawnEnemy;
-
-        viewport = GetNode<SubViewport>(viewportPath);
-
-        ConfigureEvents();
-        ConfigureRoids();
-        ConfigurePlayer();
-
-        Start();
     }
 
     private void SpawnEnemy()
@@ -136,9 +196,12 @@ public partial class GameManager : Node
         EventBus.Instance.EnemyExploded += OnEnemy_Exploded;
         EventBus.Instance.BulletHit += OnBulletHit;
         EventBus.Instance.Shoot += OnShoot;
+
+        hud.StartGame += NewGame;
+        enemyTimer.Timeout += SpawnEnemy;
     }
 
-    private void OnEnemy_Exploded(int enemyScore, Vector2 position)
+    private void OnEnemy_Exploded(uint enemyScore, Vector2 position)
     {
         EventBus.Instance.EmitSignal(EventBus.SignalName.ImpactEvent, 0.5);
         Score += enemyScore * baseScore;
@@ -154,7 +217,7 @@ public partial class GameManager : Node
     }
 
     private void SpawnRoid(
-        int size = minRoidSize,
+        uint size = minRoidSize,
         Vector2? position = null,
         Vector2? velocity = null
     )
@@ -174,11 +237,11 @@ public partial class GameManager : Node
         roid.Start(screenSize, position.Value, velocity.Value, size);
     }
 
-    private void OnRoid_Exploded(int size, int radius, Vector2 position, Vector2 velocity)
+    private void OnRoid_Exploded(uint size, int radius, Vector2 position, Vector2 velocity)
     {
         EventBus.Instance.EmitSignal(EventBus.SignalName.ImpactEvent, 0.5);
 
-        Score += size * baseScore;
+        Score += baseScore * size;
         if (size <= 1)
             return;
 
@@ -291,8 +354,8 @@ public partial class GameManager : Node
             var size = minRoidSize;
             if (level > minRoidSize)
             {
-                size = GD.RandRange(minRoidSize, level);
-                size = Mathf.Clamp(size, minRoidSize, maxRoidSize);
+                size = (uint)GD.RandRange(minRoidSize, level);
+                size = (uint)Mathf.Clamp(size, minRoidSize, maxRoidSize);
             }
             SpawnRoid(size);
         }
@@ -315,7 +378,8 @@ public partial class GameManager : Node
         enemyTimer.Stop();
         hud.GameOver();
         gameOverPlayer.Play();
-        GetTree().CallGroup("enemies", "GameOver");
+        SaveGameData();
+        GetTree().CallGroup("enemies", nameof(Enemy.Enemy.GameOver));
     }
 
     public override void _UnhandledInput(InputEvent @event)

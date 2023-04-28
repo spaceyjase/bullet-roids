@@ -7,7 +7,7 @@ public partial class EventBus : Node
 {
     [Signal]
     public delegate void RoidExplodedEventHandler(
-        int size,
+        uint size,
         int radius,
         Vector2 position,
         Vector2 linearVelocity
@@ -24,10 +24,13 @@ public partial class EventBus : Node
     public delegate void BulletHitEventHandler(PackedScene hitParticle, Vector2 position);
 
     [Signal]
-    public delegate void EnemyExplodedEventHandler(int score, Vector2 position);
+    public delegate void EnemyExplodedEventHandler(uint score, Vector2 position);
 
     [Signal]
-    public delegate void ScoreUpdatedEventHandler(int newScore);
+    public delegate void ScoreUpdatedEventHandler(uint newScore);
+
+    [Signal]
+    public delegate void HighScoreUpdatedEventHandler(uint newScore);
 
     [Signal]
     public delegate void ImpactEventEventHandler(float intensity);

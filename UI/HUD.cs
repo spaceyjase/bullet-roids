@@ -13,6 +13,7 @@ public partial class HUD : CanvasLayer
     private Label messageLabel;
     private TextureButton startButton;
     private Label scoreLabel;
+    private Label highScoreLabel;
     private Label title;
 
     public Timer MessageTimer { get; private set; }
@@ -37,11 +38,14 @@ public partial class HUD : CanvasLayer
         {
             startButton.Hide();
             title.Hide();
+            highScoreLabel.Hide();
             EmitSignal(SignalName.StartGame);
         };
         scoreLabel = GetNode<Label>("MarginContainer/HBoxContainer/ScoreLabel");
+        highScoreLabel = GetNode<Label>("MarginContainer2/HighScore");
 
         EventBus.Instance.ScoreUpdated += OnScoreUpdated;
+        EventBus.Instance.HighScoreUpdated += OnHighScoreUpdated;
     }
 
     private void ClearMessage()
@@ -50,9 +54,14 @@ public partial class HUD : CanvasLayer
         messageLabel.Hide();
     }
 
-    private void OnScoreUpdated(int newScore)
+    private void OnScoreUpdated(uint newScore)
     {
         scoreLabel.Text = $"{newScore:D10}";
+    }
+
+    private void OnHighScoreUpdated(uint newScore)
+    {
+        highScoreLabel.Text = $"High-Score: {newScore:D10}";
     }
 
     private void OnLivesUpdated(int livesRemaining)
@@ -82,5 +91,6 @@ public partial class HUD : CanvasLayer
         await ToSignal(MessageTimer, "timeout");
         startButton.Show();
         title.Show();
+        highScoreLabel.Show();
     }
 }

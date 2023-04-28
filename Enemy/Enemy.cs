@@ -116,7 +116,7 @@ public partial class Enemy : Area2D, IDamageable
         }
     }
 
-    private void GameOver()
+    internal void GameOver()
     {
         gunTimer.Stop();
     }
