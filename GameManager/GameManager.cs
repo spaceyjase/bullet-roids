@@ -39,7 +39,7 @@ public partial class GameManager : Node
 
     private const uint minRoidSize = 3;
     private const uint maxRoidSize = 5;
-    private const uint defaultHighScore = 100;
+    private const uint defaultHighScore = 500000;
     private const string gameDataPath = "user://game.data";
 
     private Camera2D camera;

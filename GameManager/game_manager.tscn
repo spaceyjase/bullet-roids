@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://8urdypu2l7vh"]
+[gd_scene load_steps=21 format=3 uid="uid://8urdypu2l7vh"]
 
 [ext_resource type="PackedScene" uid="uid://c6j1o3ex8fll4" path="res://Player/player.tscn" id="1_0rsnb"]
 [ext_resource type="Script" path="res://GameManager/GameManager.cs" id="1_dotxi"]
@@ -14,6 +14,43 @@
 [ext_resource type="AudioStream" uid="uid://bupcg3cyiw3re" path="res://Assets/Chipster1.ogg" id="8_qcfpf"]
 [ext_resource type="AudioStream" uid="uid://ckaevlc75qiec" path="res://Assets/Game Over.wav" id="9_0yb2o"]
 [ext_resource type="AudioStream" uid="uid://bdhl4efri8oej" path="res://Assets/ready.wav" id="9_x6xwa"]
+
+[sub_resource type="Animation" id="Animation_jwg8d"]
+resource_name = "fade_out"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Fader:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0.0666667, 0.105882, 0.141176, 1), Color(0.0666667, 0.105882, 0.141176, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_wvw2k"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Fader:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.0666667, 0.105882, 0.141176, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_g6xu7"]
+_data = {
+"RESET": SubResource("Animation_wvw2k"),
+"fade_out": SubResource("Animation_jwg8d")
+}
 
 [sub_resource type="Curve" id="Curve_a1q4m"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.26455, 1), 0.0, 0.0, 0, 0, Vector2(0.502646, 0), 0.0, 0.0, 0, 0, Vector2(0.746032, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -59,6 +96,21 @@ grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
 [node name="HUD" parent="." instance=ExtResource("3_ktvaq")]
+
+[node name="Fader" type="ColorRect" parent="HUD"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0666667, 0.105882, 0.141176, 1)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="HUD"]
+autoplay = "fade_out"
+libraries = {
+"": SubResource("AnimationLibrary_g6xu7")
+}
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 process_mode = 1

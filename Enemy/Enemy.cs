@@ -8,6 +8,9 @@ namespace Enemy;
 public partial class Enemy : Area2D, IDamageable
 {
     [Export]
+    private uint score = 100;
+
+    [Export]
     private PackedScene BulletScene { get; set; }
 
     [Export]
@@ -27,7 +30,6 @@ public partial class Enemy : Area2D, IDamageable
     private AnimationPlayer explosionAnimationPlayer;
     private AnimationPlayer animationPlayer;
     private PathFollow2D follow;
-    private int score;
     private int rotateScale;
     private Timer gunTimer;
     private Timer flipTimer;
@@ -60,8 +62,6 @@ public partial class Enemy : Area2D, IDamageable
         follow = new PathFollow2D();
         path.AddChild(follow);
         follow.Loop = false;
-
-        score = health;
     }
 
     private void Flip()
