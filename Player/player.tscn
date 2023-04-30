@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://c6j1o3ex8fll4"]
+[gd_scene load_steps=22 format=3 uid="uid://c6j1o3ex8fll4"]
 
 [ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_13pqw"]
 [ext_resource type="Script" path="res://Player/Player.cs" id="1_bhe4s"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://Player/States/Shoot.cs" id="7_drdju"]
 [ext_resource type="PackedScene" uid="uid://cy72ghwkujhi6" path="res://Explosion/explosion.tscn" id="11_6q6sm"]
 [ext_resource type="AudioStream" uid="uid://bfkh80p7ckg0l" path="res://Assets/flight_sound.ogg" id="12_6fnts"]
+[ext_resource type="AudioStream" uid="uid://b443alww8pwg6" path="res://Assets/Reload13.ogg" id="13_86v7j"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lqjmw"]
 radius = 7.0
@@ -76,6 +77,11 @@ _data = {
 "RESET": SubResource("Animation_y7w7x"),
 "invincible": SubResource("Animation_pce36")
 }
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_mbxmd"]
+streams_count = 1
+stream_0/stream = ExtResource("13_86v7j")
+stream_0/weight = 1.0
 
 [node name="Player" type="Node2D"]
 script = ExtResource("1_bhe4s")
@@ -147,11 +153,19 @@ libraries = {
 stream = ExtResource("12_6fnts")
 volume_db = -10.0
 
+[node name="ReloadTimer" type="Timer" parent="."]
+one_shot = true
+autostart = true
+
+[node name="ReloadSound" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamRandomizer_mbxmd")
+
 [connection signal="area_entered" from="Area2D" to="." method="OnArea2d_Area_Entered"]
 [connection signal="area_exited" from="Area2D" to="." method="OnArea2d_Area_Exited"]
 [connection signal="body_entered" from="Area2D" to="." method="OnArea2d_Body_Entered"]
 [connection signal="body_exited" from="Area2D" to="." method="OnArea2d_Body_Exited"]
 [connection signal="timeout" from="BulletCooldownTimer" to="." method="OnBulletCooldownTimer_Timeout"]
 [connection signal="animation_finished" from="Explosion/AnimationPlayer" to="." method="OnAnimation_Player_Animation_Finished"]
+[connection signal="timeout" from="ReloadTimer" to="." method="OnReloadCooldownTimer_Timeout"]
 
 [editable path="Explosion"]

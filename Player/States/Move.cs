@@ -38,7 +38,7 @@ public partial class Move : PlayerState
         {
             StateMachine?.ChangeState(nameof(Idle));
         }
-        else if (Input.IsActionPressed("shoot"))
+        else if (Input.IsActionPressed("shoot") && player.HasAmmo)
         {
             StateMachine?.ChangeState(nameof(Shoot));
         }

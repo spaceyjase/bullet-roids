@@ -16,6 +16,9 @@ public partial class Player : Moveable.Moveable
     private int startingLives = 3;
 
     [Export]
+    private int defaultAmmo = 100;
+
+    [Export]
     private int MovementSpeed { get; set; } = 350;
 
     [Export]
@@ -30,6 +33,7 @@ public partial class Player : Moveable.Moveable
     private int collisionCount;
     private Node2D bulletSpawn;
     private Timer bulletCooldownTimer;
+    private Timer reloadTimer;
     private bool canShoot = true;
     private GhostTrail sprite;
     private bool isMoving;
@@ -41,6 +45,8 @@ public partial class Player : Moveable.Moveable
     private AnimationPlayer explosionAnimationPlayer;
     private GpuParticles2D hitParticle;
     private AudioStreamPlayer engineSound;
+    private int ammo;
+    private AudioStreamPlayer reloadSound;
 
     public bool IsMoving
     {
@@ -83,6 +89,8 @@ public partial class Player : Moveable.Moveable
         bulletCooldownTimer = GetNode<Timer>("BulletCooldownTimer");
         bulletCooldownTimer.WaitTime = FireRate;
 
+        reloadTimer = GetNode<Timer>("ReloadTimer");
+
         bulletSpawn = GetNode<Node2D>("BulletSpawn");
         sprite = GetNode<GhostTrail>("Sprite2D");
 
@@ -101,6 +109,7 @@ public partial class Player : Moveable.Moveable
         sprite.Visible = false;
 
         engineSound = GetNode<AudioStreamPlayer>("EngineSound");
+        reloadSound = GetNode<AudioStreamPlayer>("ReloadSound");
     }
 
     private void OnArea2d_Area_Entered(Node area)
@@ -169,13 +178,15 @@ public partial class Player : Moveable.Moveable
 
     public bool CanShoot
     {
-        get => canShoot;
+        get => canShoot && HasAmmo;
         private set
         {
             canShoot = value;
             bulletCooldownTimer.Start();
         }
     }
+
+    public bool HasAmmo => Ammo > 0;
 
     public void Move(Vector2 movement, float rotation, double delta)
     {
@@ -205,11 +216,17 @@ public partial class Player : Moveable.Moveable
             Rotation
         );
         CanShoot = false;
+        Ammo--;
     }
 
     private void OnBulletCooldownTimer_Timeout()
     {
         CanShoot = true;
+    }
+
+    private void OnReloadCooldownTimer_Timeout()
+    {
+        CanReload = true;
     }
 
     public void Start()
@@ -221,6 +238,21 @@ public partial class Player : Moveable.Moveable
         IsInvincible = false;
         IsMoving = false;
         CollisionCount = 0;
+        Ammo = defaultAmmo;
+        CanReload = true;
+    }
+
+    private int Ammo
+    {
+        get => ammo;
+        set
+        {
+            ammo = value;
+            if (ammo > 0)
+                return;
+            ammo = 0;
+            reloadSound.Play();
+        }
     }
 
     public bool IsDead
@@ -245,6 +277,7 @@ public partial class Player : Moveable.Moveable
         get => isInvincible;
         set
         {
+            Ammo = defaultAmmo;
             isInvincible = value;
             GetNode<CollisionShape2D>("Area2D/CollisionShape2D")
                 .CallDeferred("set_disabled", value);
@@ -255,6 +288,8 @@ public partial class Player : Moveable.Moveable
             invincibleTimer.Start();
         }
     }
+
+    public bool CanReload { get; private set; } = true;
 
     private void OnAnimation_Player_Animation_Finished(StringName name)
     {
