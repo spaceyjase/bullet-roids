@@ -274,7 +274,7 @@ public partial class GameManager : Node
 
     private void SpawnBurst(Vector2 position)
     {
-        var burst = burstScene.Instantiate<Burst>();
+        var burst = burstScene.Instantiate<Burst.Burst>();
         enemies.AddChild(burst);
         burst.Start(position);
     }
