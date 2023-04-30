@@ -44,6 +44,9 @@ public partial class GameManager : Node
     [Export]
     private uint spawnBurstLevel = 5;
 
+    [Export]
+    private uint levelCap = 10;
+
     private const uint minRoidSize = 3;
     private const uint maxRoidSize = 5;
     private const uint defaultHighScore = 5000;
@@ -369,7 +372,16 @@ public partial class GameManager : Node
         DestroyEnemies();
 
         level++;
-        hud.ShowMessage($"Wave {level}");
+        if (level > levelCap)
+        {
+            hud.ShowMessage("Infinite");
+            level = levelCap;
+        }
+        else
+        {
+            hud.ShowMessage($"Wave {(level == 10 ? "X" : level)}");
+        }
+
         for (var i = 0; i < level; ++i)
         {
             var size = minRoidSize;
@@ -381,7 +393,7 @@ public partial class GameManager : Node
             SpawnRoid(size);
         }
         levelUpSound.Play();
-        if (level <= enemySpawnLevel)
+        if (level < enemySpawnLevel)
             return;
         enemyTimer.WaitTime = GD.RandRange(5, 10);
         enemyTimer.Start();
