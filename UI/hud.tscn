@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dokqgdrx5pyl6"]
+[gd_scene load_steps=11 format=3 uid="uid://dokqgdrx5pyl6"]
 
 [ext_resource type="Script" path="res://UI/HUD.cs" id="1_ddo0s"]
 [ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_jo017"]
@@ -19,8 +19,11 @@ keycode = 4194309
 action = &"pause_game"
 pressed = true
 
+[sub_resource type="InputEventJoypadButton" id="InputEventJoypadButton_22yn0"]
+pressed = true
+
 [sub_resource type="Shortcut" id="Shortcut_rvh8x"]
-events = [SubResource("InputEventKey_kqwre"), SubResource("InputEventAction_0bbe3")]
+events = [SubResource("InputEventKey_kqwre"), SubResource("InputEventAction_0bbe3"), SubResource("InputEventJoypadButton_22yn0")]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_ddo0s")
