@@ -16,6 +16,9 @@ public partial class Player : Moveable.Moveable
     private int startingLives = 3;
 
     [Export]
+    private uint defaultAmmo = 100;
+
+    [Export]
     private int MovementSpeed { get; set; } = 350;
 
     [Export]
@@ -30,6 +33,7 @@ public partial class Player : Moveable.Moveable
     private int collisionCount;
     private Node2D bulletSpawn;
     private Timer bulletCooldownTimer;
+    private Timer reloadTimer;
     private bool canShoot = true;
     private GhostTrail sprite;
     private bool isMoving;
@@ -41,6 +45,12 @@ public partial class Player : Moveable.Moveable
     private AnimationPlayer explosionAnimationPlayer;
     private GpuParticles2D hitParticle;
     private AudioStreamPlayer engineSound;
+    private uint ammo;
+    private AudioStreamPlayer reloadSound;
+    private Area2D rechargeArea;
+    private int charging;
+    private GpuParticles2D chargeParticle;
+    private AudioStreamPlayer2D chargingSound;
 
     public bool IsMoving
     {
@@ -83,6 +93,12 @@ public partial class Player : Moveable.Moveable
         bulletCooldownTimer = GetNode<Timer>("BulletCooldownTimer");
         bulletCooldownTimer.WaitTime = FireRate;
 
+        reloadTimer = GetNode<Timer>("ReloadTimer");
+        reloadTimer.WaitTime = FireRate;
+
+        chargeParticle = GetNode<GpuParticles2D>("ChargeParticle");
+        chargingSound = GetNode<AudioStreamPlayer2D>("ChargeSound");
+
         bulletSpawn = GetNode<Node2D>("BulletSpawn");
         sprite = GetNode<GhostTrail>("Sprite2D");
 
@@ -101,7 +117,47 @@ public partial class Player : Moveable.Moveable
         sprite.Visible = false;
 
         engineSound = GetNode<AudioStreamPlayer>("EngineSound");
+        reloadSound = GetNode<AudioStreamPlayer>("ReloadSound");
+
+        rechargeArea = GetNode<Area2D>("RechargeArea");
+        rechargeArea.BodyEntered += OnRechargeArea_AreaEntered;
+        rechargeArea.AreaEntered += OnRechargeArea_AreaEntered;
+        rechargeArea.BodyExited += OnRechargeArea_AreaExited;
+        rechargeArea.AreaExited += OnRechargeArea_AreaExited;
     }
+
+    private void OnRechargeArea_AreaExited(Node2D node)
+    {
+        ChargingCount--;
+    }
+
+    private void OnRechargeArea_AreaEntered(Node2D node)
+    {
+        ChargingCount++;
+    }
+
+    private void DoCharging()
+    {
+        chargeParticle.Emitting = IsCharging;
+        if (!IsActive)
+            return;
+        if (Ammo >= defaultAmmo)
+        {
+            reloadTimer.Stop();
+            return;
+        }
+
+        if (IsCharging)
+        {
+            reloadTimer.Start();
+        }
+        else
+        {
+            reloadTimer.Stop();
+        }
+    }
+
+    private bool IsCharging => ChargingCount > 0;
 
     private void OnArea2d_Area_Entered(Node area)
     {
@@ -153,6 +209,8 @@ public partial class Player : Moveable.Moveable
 
     private void Explode()
     {
+        ChargingCount = 0;
+        reloadTimer.Stop();
         engineSound.Stop();
         explosion.Show();
         explosion.GlobalPosition = GlobalPosition;
@@ -169,13 +227,15 @@ public partial class Player : Moveable.Moveable
 
     public bool CanShoot
     {
-        get => canShoot;
+        get => canShoot && HasAmmo;
         private set
         {
             canShoot = value;
             bulletCooldownTimer.Start();
         }
     }
+
+    public bool HasAmmo => Ammo > 0;
 
     public void Move(Vector2 movement, float rotation, double delta)
     {
@@ -205,11 +265,18 @@ public partial class Player : Moveable.Moveable
             Rotation
         );
         CanShoot = false;
+        Ammo--;
     }
 
     private void OnBulletCooldownTimer_Timeout()
     {
         CanShoot = true;
+    }
+
+    private void OnReloadCooldownTimer_Timeout()
+    {
+        chargingSound.Play();
+        Ammo++;
     }
 
     public void Start()
@@ -221,6 +288,41 @@ public partial class Player : Moveable.Moveable
         IsInvincible = false;
         IsMoving = false;
         CollisionCount = 0;
+        ChargingCount = 0;
+        Ammo = defaultAmmo;
+        CanReload = true;
+        chargeParticle.Emitting = false;
+    }
+
+    private int ChargingCount
+    {
+        get => charging;
+        set
+        {
+            if (value < 0)
+            {
+                value = 0;
+            }
+            charging = value;
+            DoCharging();
+        }
+    }
+
+    public uint Ammo
+    {
+        get => ammo;
+        private set
+        {
+            ammo = value;
+            if (ammo >= defaultAmmo)
+                ammo = defaultAmmo;
+            if (ammo <= 0)
+                ammo = 0;
+            EventBus.Instance.EmitSignal(EventBus.SignalName.AmmoUpdated, Ammo);
+            if (ammo > 0)
+                return;
+            reloadSound.Play();
+        }
     }
 
     public bool IsDead
@@ -229,8 +331,7 @@ public partial class Player : Moveable.Moveable
         private set
         {
             isDead = value;
-            GetNode<CollisionShape2D>("Area2D/CollisionShape2D")
-                .CallDeferred("set_disabled", value);
+            ConfigureColliders(value);
             if (!isDead)
                 return;
             sprite.Hide();
@@ -240,14 +341,21 @@ public partial class Player : Moveable.Moveable
         }
     }
 
+    private void ConfigureColliders(bool disabled)
+    {
+        GetNode<CollisionShape2D>("Area2D/CollisionShape2D").CallDeferred("set_disabled", disabled);
+        GetNode<CollisionShape2D>("RechargeArea/CollisionShape2D")
+            .CallDeferred("set_disabled", disabled);
+    }
+
     private bool IsInvincible
     {
         get => isInvincible;
         set
         {
+            Ammo = defaultAmmo;
             isInvincible = value;
-            GetNode<CollisionShape2D>("Area2D/CollisionShape2D")
-                .CallDeferred("set_disabled", value);
+            ConfigureColliders(value);
             if (!value)
                 return;
             GetNode<AnimationPlayer>("AnimationPlayer").Play("invincible");
@@ -255,6 +363,8 @@ public partial class Player : Moveable.Moveable
             invincibleTimer.Start();
         }
     }
+
+    private bool CanReload { get; set; } = true;
 
     private void OnAnimation_Player_Animation_Finished(StringName name)
     {

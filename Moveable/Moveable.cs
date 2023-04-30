@@ -20,7 +20,6 @@ public partial class Moveable : Node2D
         {
             position.X = 0;
         }
-
         if (position.X < 0)
         {
             position.X = ScreenSize.X;

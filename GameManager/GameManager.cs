@@ -393,6 +393,7 @@ public partial class GameManager : Node
             SpawnRoid(size);
         }
         levelUpSound.Play();
+        Score += player.Ammo * baseScore;
         if (level < enemySpawnLevel)
             return;
         enemyTimer.WaitTime = GD.RandRange(5, 10);
