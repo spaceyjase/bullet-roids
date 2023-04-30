@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dokqgdrx5pyl6"]
+[gd_scene load_steps=12 format=3 uid="uid://dokqgdrx5pyl6"]
 
 [ext_resource type="Script" path="res://UI/HUD.cs" id="1_ddo0s"]
 [ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_jo017"]
@@ -9,6 +9,10 @@
 [sub_resource type="AtlasTexture" id="AtlasTexture_kqym2"]
 atlas = ExtResource("1_jo017")
 region = Rect2(392, 8, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mg3nw"]
+atlas = ExtResource("1_jo017")
+region = Rect2(464, 320, 32, 64)
 
 [sub_resource type="InputEventKey" id="InputEventKey_kqwre"]
 device = -1
@@ -46,7 +50,7 @@ layout_mode = 2
 [node name="L1" type="TextureRect" parent="MarginContainer/HBoxContainer/LivesContainer"]
 layout_mode = 2
 texture = SubResource("AtlasTexture_kqym2")
-expand_mode = 2
+stretch_mode = 3
 
 [node name="L2" type="TextureRect" parent="MarginContainer/HBoxContainer/LivesContainer"]
 layout_mode = 2
@@ -65,6 +69,26 @@ theme_override_fonts/font = ExtResource("2_70nku")
 theme_override_font_sizes/font_size = 32
 text = "0000000000"
 horizontal_alignment = 2
+
+[node name="AmmoContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 5
+
+[node name="AmmoLabel" type="Label" parent="MarginContainer/AmmoContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_fonts/font = ExtResource("2_70nku")
+theme_override_font_sizes/font_size = 32
+text = "000"
+horizontal_alignment = 2
+
+[node name="L1" type="TextureRect" parent="MarginContainer/AmmoContainer"]
+custom_minimum_size = Vector2(10, 30)
+layout_mode = 2
+size_flags_vertical = 4
+texture = SubResource("AtlasTexture_mg3nw")
+expand_mode = 5
 
 [node name="Title" type="Label" parent="."]
 anchors_preset = 5

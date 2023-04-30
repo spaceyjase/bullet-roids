@@ -15,6 +15,7 @@ public partial class HUD : CanvasLayer
     private Label scoreLabel;
     private Label highScoreLabel;
     private Label title;
+    private Label ammoLabel;
 
     public Timer MessageTimer { get; private set; }
 
@@ -43,9 +44,17 @@ public partial class HUD : CanvasLayer
         };
         scoreLabel = GetNode<Label>("MarginContainer/HBoxContainer/ScoreLabel");
         highScoreLabel = GetNode<Label>("MarginContainer2/HighScore");
+        ammoLabel = GetNode<Label>("MarginContainer/AmmoContainer/AmmoLabel");
 
         EventBus.Instance.ScoreUpdated += OnScoreUpdated;
+        EventBus.Instance.AmmoUpdated += OnAmmoUpdated;
         EventBus.Instance.HighScoreUpdated += OnHighScoreUpdated;
+    }
+
+    private void OnAmmoUpdated(uint newAmmo)
+    {
+        ammoLabel.Text = $"{newAmmo:D3}";
+        ammoLabel.Modulate = newAmmo == 0 ? new Color(1, 0, 0) : new Color(1, 1, 1);
     }
 
     private void ClearMessage()

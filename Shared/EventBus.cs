@@ -30,6 +30,9 @@ public partial class EventBus : Node
     public delegate void ScoreUpdatedEventHandler(uint newScore);
 
     [Signal]
+    public delegate void AmmoUpdatedEventHandler(uint newAmmo);
+
+    [Signal]
     public delegate void HighScoreUpdatedEventHandler(uint newScore);
 
     [Signal]

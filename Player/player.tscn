@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://c6j1o3ex8fll4"]
+[gd_scene load_steps=30 format=3 uid="uid://c6j1o3ex8fll4"]
 
 [ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_13pqw"]
 [ext_resource type="Script" path="res://Player/Player.cs" id="1_bhe4s"]
@@ -13,9 +13,13 @@
 [ext_resource type="PackedScene" uid="uid://cy72ghwkujhi6" path="res://Explosion/explosion.tscn" id="11_6q6sm"]
 [ext_resource type="AudioStream" uid="uid://bfkh80p7ckg0l" path="res://Assets/flight_sound.ogg" id="12_6fnts"]
 [ext_resource type="AudioStream" uid="uid://b443alww8pwg6" path="res://Assets/Reload13.ogg" id="13_86v7j"]
+[ext_resource type="AudioStream" uid="uid://dqknd8k4eqkii" path="res://Assets/Buff1.ogg" id="14_vajrm"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_lqjmw"]
 radius = 7.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_816yi"]
+radius = 60.0
 
 [sub_resource type="Curve" id="Curve_h1qc8"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -83,6 +87,42 @@ streams_count = 1
 stream_0/stream = ExtResource("13_86v7j")
 stream_0/weight = 1.0
 
+[sub_resource type="Gradient" id="Gradient_wpl8e"]
+offsets = PackedFloat32Array(0, 0.144144, 0.900901, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_ep7mb"]
+gradient = SubResource("Gradient_wpl8e")
+
+[sub_resource type="Curve" id="Curve_xbjbq"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.15493, 1), 0.0, 0.0, 0, 0, Vector2(0.887324, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_dheaj"]
+curve = SubResource("Curve_xbjbq")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vxklj"]
+lifetime_randomness = 0.2
+emission_shape = 6
+emission_ring_axis = Vector3(0, 0, 1)
+emission_ring_height = 1.0
+emission_ring_radius = 50.0
+emission_ring_inner_radius = 0.0
+particle_flag_disable_z = true
+gravity = Vector3(0, 0, 0)
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.1
+radial_accel_min = -97.06
+radial_accel_max = -23.53
+scale_min = 0.5
+scale_max = 1.5
+scale_curve = SubResource("CurveTexture_dheaj")
+color_ramp = SubResource("GradientTexture1D_ep7mb")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1r0tm"]
+atlas = ExtResource("1_13pqw")
+region = Rect2(472, 216, 16, 16)
+
 [node name="Player" type="Node2D"]
 script = ExtResource("1_bhe4s")
 BulletScene = ExtResource("2_qgw0c")
@@ -94,6 +134,14 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_lqjmw")
 debug_color = Color(0, 0.6, 0.701961, 0.419608)
+
+[node name="RechargeArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 22
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RechargeArea"]
+shape = SubResource("CircleShape2D_816yi")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 z_index = 1
@@ -154,11 +202,21 @@ stream = ExtResource("12_6fnts")
 volume_db = -10.0
 
 [node name="ReloadTimer" type="Timer" parent="."]
-one_shot = true
-autostart = true
 
 [node name="ReloadSound" type="AudioStreamPlayer" parent="."]
 stream = SubResource("AudioStreamRandomizer_mbxmd")
+
+[node name="ChargeParticle" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 32
+process_material = SubResource("ParticleProcessMaterial_vxklj")
+texture = SubResource("AtlasTexture_1r0tm")
+lifetime = 1.5
+speed_scale = 3.0
+local_coords = true
+
+[node name="ChargeSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("14_vajrm")
 
 [connection signal="area_entered" from="Area2D" to="." method="OnArea2d_Area_Entered"]
 [connection signal="area_exited" from="Area2D" to="." method="OnArea2d_Area_Exited"]
