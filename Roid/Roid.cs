@@ -22,12 +22,15 @@ public partial class Roid : PhysicsMoveable, IDamageable
     [Export]
     private float scaleFactor = 0.2f;
 
+    private const double minSize = 1;
+
     private float size;
     private Sprite2D sprite;
     private int health;
     private Sprite2D explosion;
     private AnimationPlayer explosionAnimationPlayer;
     private AudioStreamPlayer2D collisionPlayer;
+    private AnimationPlayer animationPlayer;
 
     public override void _Ready()
     {
@@ -40,6 +43,8 @@ public partial class Roid : PhysicsMoveable, IDamageable
         explosion = GetNode<Sprite2D>("Explosion");
         explosionAnimationPlayer = explosion.GetNode<AnimationPlayer>("AnimationPlayer");
 
+        animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+
         collisionPlayer = GetNode<AudioStreamPlayer2D>("CollisionPlayer");
         BodyEntered += body =>
         {
@@ -48,8 +53,15 @@ public partial class Roid : PhysicsMoveable, IDamageable
         };
     }
 
-    public void Start(Vector2 screenSize, Vector2 position, Vector2 velocity, float startSize)
+    public void Start(
+        Vector2 screenSize,
+        Vector2 position,
+        Vector2 velocity,
+        float startSize,
+        bool burst = false
+    )
     {
+        WillBurst = burst;
         ScreenSize = screenSize;
         Position = position;
         size = startSize;
@@ -62,6 +74,8 @@ public partial class Roid : PhysicsMoveable, IDamageable
 
         CallDeferred(nameof(SetShape), velocity);
     }
+
+    private bool WillBurst { get; set; }
 
     private void SetShape(Vector2 velocity)
     {
@@ -82,6 +96,10 @@ public partial class Roid : PhysicsMoveable, IDamageable
         if (health < 0)
         {
             Explode();
+        }
+        else if (WillBurst && size <= minSize && !animationPlayer.IsPlaying())
+        {
+            animationPlayer.Play("flash");
         }
     }
 

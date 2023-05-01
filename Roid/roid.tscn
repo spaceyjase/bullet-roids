@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://daf17l5byew6k"]
+[gd_scene load_steps=12 format=3 uid="uid://daf17l5byew6k"]
 
 [ext_resource type="Script" path="res://Roid/Roid.cs" id="1_8uk7o"]
 [ext_resource type="PhysicsMaterial" uid="uid://bij3lb2d3bhap" path="res://Roid/roid_physics_material.tres" id="1_8w0vr"]
 [ext_resource type="Texture2D" uid="uid://b0jlg5sj65miq" path="res://Assets/simpleSpace_tilesheet@2.png" id="3_arbr8"]
 [ext_resource type="PackedScene" uid="uid://cy72ghwkujhi6" path="res://Explosion/explosion.tscn" id="4_loj5q"]
 [ext_resource type="AudioStream" uid="uid://bdk3kmqn3kl5h" path="res://Assets/AsteroidCollision.wav" id="5_sve78"]
+[ext_resource type="Animation" uid="uid://imvfmc0uank4" path="res://Shared/Animations/flash.res" id="6_1kj15"]
 
 [sub_resource type="Curve" id="Curve_moayg"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -35,6 +36,11 @@ streams_count = 1
 random_volume_offset_db = 1.0
 stream_0/stream = ExtResource("5_sve78")
 stream_0/weight = 1.0
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_n1gok"]
+_data = {
+"flash": ExtResource("6_1kj15")
+}
 
 [node name="Roid" type="RigidBody2D" groups=["Roid"]]
 collision_layer = 16
@@ -91,6 +97,11 @@ randomness = 1.0
 [node name="CollisionPlayer" type="AudioStreamPlayer2D" parent="."]
 stream = SubResource("AudioStreamRandomizer_4cn3n")
 volume_db = -5.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_n1gok")
+}
 
 [connection signal="animation_finished" from="Explosion/AnimationPlayer" to="." method="OnAnimation_Player_Animation_Finished"]
 

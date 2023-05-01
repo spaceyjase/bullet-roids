@@ -244,7 +244,7 @@ public partial class GameManager : Node
         var roid = roidScene.Instantiate<Roid.Roid>();
         roids.AddChild(roid);
 
-        roid.Start(screenSize, position.Value, velocity.Value, size);
+        roid.Start(screenSize, position.Value, velocity.Value, size, level > spawnBurstLevel);
     }
 
     private void OnRoid_Exploded(uint size, int radius, Vector2 position, Vector2 velocity)
