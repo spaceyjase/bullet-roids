@@ -189,9 +189,10 @@ public partial class Player : Moveable.Moveable
             return;
         if (IsInvincible || CollisionCount <= 0)
             return;
+
         if (area is IDamageable damageable)
         {
-            damageable.Damage();
+            damageable.Crash();
         }
 
         Explode();

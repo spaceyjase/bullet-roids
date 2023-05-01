@@ -125,4 +125,9 @@ public partial class Roid : PhysicsMoveable, IDamageable
     {
         QueueFree();
     }
+
+    public void Crash()
+    {
+        Explode();
+    }
 }

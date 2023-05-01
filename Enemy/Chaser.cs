@@ -169,4 +169,9 @@ public partial class Chaser : Area2D, IDamageable
         chargePlayer.Stop();
         gunTimer.Stop();
     }
+
+    public void Crash()
+    {
+        Explode();
+    }
 }
