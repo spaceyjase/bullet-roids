@@ -1,0 +1,187 @@
+[gd_scene load_steps=18 format=3 uid="uid://ec7qb3ega1yo"]
+
+[ext_resource type="Texture2D" uid="uid://b0jlg5sj65miq" path="res://Assets/simpleSpace_tilesheet@2.png" id="1_6g0x0"]
+[ext_resource type="Script" path="res://Enemy/Chaser.cs" id="1_lute8"]
+[ext_resource type="PackedScene" uid="uid://dfltn36xdnxjy" path="res://Burst/Bullet/burst_bullet.tscn" id="2_04xmm"]
+[ext_resource type="PackedScene" uid="uid://cy72ghwkujhi6" path="res://Explosion/explosion.tscn" id="2_udhgd"]
+[ext_resource type="AudioStream" uid="uid://bbhiylb1xt81j" path="res://Assets/Teleport.ogg" id="3_w38sf"]
+[ext_resource type="Animation" uid="uid://imvfmc0uank4" path="res://Shared/Animations/flash.res" id="5_i1s7b"]
+[ext_resource type="Script" path="res://Player/GhostTrail.cs" id="7_58agn"]
+[ext_resource type="PackedScene" uid="uid://dqv3e06e4o5kf" path="res://Shared/fading_sprite.tscn" id="8_xya84"]
+[ext_resource type="PackedScene" uid="uid://c2mym463o7fac" path="res://Shared/charge_particle.tscn" id="9_o4vym"]
+[ext_resource type="AudioStream" uid="uid://bere0fwr6oyxl" path="res://Assets/Spawn2.ogg" id="10_eiwx6"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5eygb"]
+radius = 18.0
+height = 86.0
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_58fmq"]
+load_path = "res://.godot/imported/simpleSpace_tilesheet@2.png-d9db35ef5ec95850c521f94cf207b1d4.ctex"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_disb0"]
+_data = {
+"flash": ExtResource("5_i1s7b")
+}
+
+[sub_resource type="Animation" id="Animation_i45db"]
+resource_name = "oscillate"
+length = 1.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Turret:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.8, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 3.14159, 0.0, 3.14159]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ChargeParticle:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("ChargePlayer:playing")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+
+[sub_resource type="Animation" id="Animation_jcs5m"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Turret:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ChargeParticle:emitting")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("ChargePlayer:playing")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_mbll5"]
+_data = {
+"RESET": SubResource("Animation_jcs5m"),
+"oscillate": SubResource("Animation_i45db")
+}
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_t8nca"]
+streams_count = 1
+stream_0/stream = ExtResource("10_eiwx6")
+stream_0/weight = 1.0
+
+[node name="Chaser" type="Area2D" groups=["enemies"]]
+collision_layer = 2
+collision_mask = 9
+monitoring = false
+script = ExtResource("1_lute8")
+BulletScene = ExtResource("2_04xmm")
+shootDelay = 0.01
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_5eygb")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+rotation = 1.5708
+texture = ExtResource("1_6g0x0")
+region_enabled = true
+region_rect = Rect2(400, 144, 96, 96)
+
+[node name="Trail" type="Sprite2D" parent="."]
+z_index = 1
+rotation = 1.5708
+texture = SubResource("CompressedTexture2D_58fmq")
+region_enabled = true
+region_rect = Rect2(400, 144, 96, 96)
+script = ExtResource("7_58agn")
+fadingSpriteScene = ExtResource("8_xya84")
+
+[node name="Timer" type="Timer" parent="Trail"]
+wait_time = 0.05
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_disb0")
+}
+
+[node name="Explosion" parent="." instance=ExtResource("2_udhgd")]
+scale = Vector2(2, 2)
+
+[node name="GunTimer" type="Timer" parent="."]
+wait_time = 5.0
+autostart = true
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_w38sf")
+autoplay = true
+bus = &"SFX"
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
+[node name="Turret" type="Node2D" parent="."]
+position = Vector2(56, 0)
+
+[node name="TurretAnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_mbll5")
+}
+
+[node name="ChargeParticle" parent="." instance=ExtResource("9_o4vym")]
+position = Vector2(56, 0)
+scale = Vector2(0.75, 0.75)
+emitting = true
+
+[node name="ChargePlayer" type="AudioStreamPlayer2D" parent="."]
+stream = SubResource("AudioStreamRandomizer_t8nca")
+volume_db = -8.0
+autoplay = true
+bus = &"SFX"
+
+[connection signal="animation_finished" from="Explosion/AnimationPlayer" to="." method="OnAnimation_Player_Animation_Finished"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="OnVisibleOnScreenNotifier2d_ScreenExited"]
+
+[editable path="Explosion"]

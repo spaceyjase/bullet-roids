@@ -1,4 +1,5 @@
 using System;
+using Enemy;
 using Godot;
 using Shared;
 using UI;
@@ -15,6 +16,9 @@ public partial class GameManager : Node
 
     [Export]
     private PackedScene enemyScene;
+
+    [Export]
+    private PackedScene chaseEnemyScene;
 
     [Export]
     private PackedScene burstScene;
@@ -37,6 +41,9 @@ public partial class GameManager : Node
 
     [Export]
     private int enemySpawnLevel = 3;
+
+    [Export]
+    private ulong chaseSpawnLevel = 7;
 
     [Export]
     private uint baseScore = 10;
@@ -98,6 +105,7 @@ public partial class GameManager : Node
     private AudioStreamPlayer readyPlayer;
     private AudioStreamPlayer gameOverPlayer;
     private Timer enemyTimer;
+    private Timer chaserTimer;
     private Godot.Collections.Dictionary<string, Variant> data = new();
 
     public override void _Ready()
@@ -168,6 +176,7 @@ public partial class GameManager : Node
         particles = GetNode<Node>(particleParentPath);
         hud = GetNode<HUD>("HUD");
         enemyTimer = GetNode<Timer>("EnemyTimer");
+        chaserTimer = GetNode<Timer>("ChaserTimer");
         viewport = GetNode<SubViewport>(viewportPath);
     }
 
@@ -209,6 +218,21 @@ public partial class GameManager : Node
 
         hud.StartGame += NewGame;
         enemyTimer.Timeout += SpawnEnemy;
+        chaserTimer.Timeout += SpawnChaserEnemy;
+    }
+
+    private void SpawnChaserEnemy()
+    {
+        var chaser = chaseEnemyScene.Instantiate<Chaser>();
+
+        roidSpawner.Progress = GD.Randi();
+        chaser.Position = roidSpawner.Position;
+
+        enemies.AddChild(chaser);
+        chaser.Target = player;
+
+        chaserTimer.WaitTime = GD.RandRange(10, 20);
+        chaserTimer.Start();
     }
 
     private void OnEnemy_Exploded(uint enemyScore, Vector2 position)
@@ -394,10 +418,17 @@ public partial class GameManager : Node
         }
         levelUpSound.Play();
         Score += player.Ammo * baseScore;
-        if (level < enemySpawnLevel)
+
+        if (level >= enemySpawnLevel)
+        {
+            enemyTimer.WaitTime = GD.RandRange(5, 10);
+            enemyTimer.Start();
+        }
+
+        if (level < chaseSpawnLevel)
             return;
-        enemyTimer.WaitTime = GD.RandRange(5, 10);
-        enemyTimer.Start();
+        chaserTimer.WaitTime = GD.RandRange(5, 10);
+        chaserTimer.Start();
     }
 
     private void DestroyEnemies()
@@ -409,11 +440,17 @@ public partial class GameManager : Node
     {
         playing = false;
         backgroundMusic.Stop();
-        enemyTimer.Stop();
+        StopTimers();
         hud.GameOver();
         gameOverPlayer.Play();
         SaveGameData();
-        GetTree().CallGroup("enemies", nameof(Enemy.Enemy.GameOver));
+        GetTree().CallGroup("enemies", "GameOver");
+    }
+
+    private void StopTimers()
+    {
+        enemyTimer.Stop();
+        chaserTimer.Stop();
     }
 
     public override void _UnhandledInput(InputEvent @event)

@@ -65,6 +65,7 @@ _data = {
 [node name="Enemy" type="Area2D" groups=["enemies"]]
 collision_layer = 2
 collision_mask = 9
+monitoring = false
 script = ExtResource("1_kj6ka")
 BulletScene = ExtResource("2_hrdxe")
 pulseAmount = 6
@@ -101,7 +102,7 @@ libraries = {
 "": SubResource("AnimationLibrary_236ir")
 }
 
-[node name="Explosion" parent="." groups=["Enemy"] instance=ExtResource("2_onha4")]
+[node name="Explosion" parent="." instance=ExtResource("2_onha4")]
 scale = Vector2(2, 2)
 
 [node name="EnemyPaths" parent="." instance=ExtResource("3_8xee3")]
