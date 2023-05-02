@@ -41,6 +41,7 @@ public partial class Player : Moveable.Moveable
     private bool isDead;
     private bool isInvincible;
     private Timer invincibleTimer;
+    private Timer respawnTimer;
     private Sprite2D explosion;
     private AnimationPlayer explosionAnimationPlayer;
     private GpuParticles2D hitParticle;
@@ -51,6 +52,8 @@ public partial class Player : Moveable.Moveable
     private int charging;
     private GpuParticles2D chargeParticle;
     private AudioStreamPlayer2D chargingSound;
+    private bool respawning;
+    private AudioStreamPlayer respawnAudio;
 
     public bool IsMoving
     {
@@ -105,9 +108,14 @@ public partial class Player : Moveable.Moveable
         invincibleTimer = GetNode<Timer>("InvincibleTimer");
         invincibleTimer.Timeout += () =>
         {
-            IsActive = true;
             IsInvincible = false;
         };
+        respawnTimer = GetNode<Timer>("RespawnTimer");
+        respawnTimer.Timeout += () =>
+        {
+            respawning = false;
+        };
+        respawnAudio = GetNode<AudioStreamPlayer>("RespawnAudio");
 
         explosion = GetNode<Sprite2D>("Explosion");
         explosionAnimationPlayer = explosion.GetNode<AnimationPlayer>("AnimationPlayer");
@@ -138,9 +146,9 @@ public partial class Player : Moveable.Moveable
 
     private void DoCharging()
     {
-        chargeParticle.Emitting = IsCharging;
         if (!IsActive)
             return;
+        chargeParticle.Emitting = IsCharging;
         if (Ammo >= defaultAmmo)
         {
             reloadTimer.Stop();
@@ -240,6 +248,9 @@ public partial class Player : Moveable.Moveable
 
     public void Move(Vector2 movement, float rotation, double delta)
     {
+        if (Respawning)
+            return;
+
         if (Mathf.IsZeroApprox(movement.X) && Mathf.IsZeroApprox(movement.Y))
         {
             IsMoving = false;
@@ -259,6 +270,8 @@ public partial class Player : Moveable.Moveable
 
     public void Fire()
     {
+        if (Respawning)
+            return;
         EventBus.Instance.EmitSignal(
             EventBus.SignalName.Shoot,
             BulletScene,
@@ -360,8 +373,25 @@ public partial class Player : Moveable.Moveable
             if (!value)
                 return;
             GetNode<AnimationPlayer>("AnimationPlayer").Play("invincible");
-            IsActive = false;
             invincibleTimer.Start();
+            Respawning = true;
+        }
+    }
+
+    private bool Respawning
+    {
+        get => respawning;
+        set
+        {
+            respawning = value;
+            if (!respawning)
+                return;
+            if (!respawnAudio.Playing)
+            {
+                respawnAudio.Play();
+            }
+
+            respawnTimer.Start();
         }
     }
 

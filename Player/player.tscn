@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://c6j1o3ex8fll4"]
+[gd_scene load_steps=26 format=3 uid="uid://c6j1o3ex8fll4"]
 
 [ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_13pqw"]
 [ext_resource type="Script" path="res://Player/Player.cs" id="1_bhe4s"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://Player/States/Shoot.cs" id="7_drdju"]
 [ext_resource type="PackedScene" uid="uid://cy72ghwkujhi6" path="res://Explosion/explosion.tscn" id="11_6q6sm"]
 [ext_resource type="AudioStream" uid="uid://bfkh80p7ckg0l" path="res://Assets/flight_sound.ogg" id="12_6fnts"]
+[ext_resource type="AudioStream" uid="uid://bnq7nho2u8njx" path="res://Assets/zap2a.ogg" id="12_k3nj6"]
 [ext_resource type="AudioStream" uid="uid://b443alww8pwg6" path="res://Assets/Reload13.ogg" id="13_86v7j"]
 [ext_resource type="PackedScene" uid="uid://c2mym463o7fac" path="res://Shared/charge_particle.tscn" id="14_1rvyx"]
 [ext_resource type="AudioStream" uid="uid://dqknd8k4eqkii" path="res://Assets/Buff1.ogg" id="14_vajrm"]
@@ -156,6 +157,14 @@ scale = Vector2(2, 2)
 [node name="InvincibleTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
+
+[node name="RespawnTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[node name="RespawnAudio" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("12_k3nj6")
+volume_db = -4.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
