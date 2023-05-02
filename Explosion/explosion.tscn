@@ -1,11 +1,11 @@
 [gd_scene load_steps=7 format=3 uid="uid://cy72ghwkujhi6"]
 
 [ext_resource type="Texture2D" uid="uid://kkjk86ft5466" path="res://Assets/explosion_200x200px.png" id="1_pldxp"]
-[ext_resource type="AudioStream" uid="uid://qeo8mhsc38ca" path="res://Assets/synthetic_thunder_short.wav" id="2_ydhiq"]
+[ext_resource type="AudioStream" uid="uid://cth7glkkstk73" path="res://Assets/explosion.ogg" id="2_q3da4"]
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_yt3se"]
 streams_count = 1
-stream_0/stream = ExtResource("2_ydhiq")
+stream_0/stream = ExtResource("2_q3da4")
 stream_0/weight = 1.0
 
 [sub_resource type="Animation" id="Animation_3cplb"]
