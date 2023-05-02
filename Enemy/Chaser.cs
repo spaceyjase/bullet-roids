@@ -1,6 +1,5 @@
 using Damageable;
 using Godot;
-using Player;
 using Shared;
 
 namespace Enemy;

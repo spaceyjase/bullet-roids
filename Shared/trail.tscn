@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://c4tp56jtkmm8d"]
+
+[ext_resource type="Texture2D" uid="uid://dpnaw2uxwq86h" path="res://Assets/simpleSpace_tilesheet.png" id="1_mxc66"]
+[ext_resource type="Script" path="res://Shared/GhostTrail.cs" id="2_4dgb3"]
+[ext_resource type="PackedScene" uid="uid://dqv3e06e4o5kf" path="res://Shared/fading_sprite.tscn" id="3_dx71s"]
+
+[node name="Trail" type="Sprite2D"]
+z_index = 1
+texture = ExtResource("1_mxc66")
+region_enabled = true
+region_rect = Rect2(392, 8, 48, 48)
+script = ExtResource("2_4dgb3")
+fadingSpriteScene = ExtResource("3_dx71s")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.05

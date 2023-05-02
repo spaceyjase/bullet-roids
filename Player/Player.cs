@@ -35,7 +35,7 @@ public partial class Player : Moveable.Moveable
     private Timer bulletCooldownTimer;
     private Timer reloadTimer;
     private bool canShoot = true;
-    private GhostTrail sprite;
+    private GhostTrail trail;
     private bool isMoving;
     private int lives;
     private bool isDead;
@@ -61,7 +61,7 @@ public partial class Player : Moveable.Moveable
         set
         {
             isMoving = value;
-            sprite.IsEmitting = value;
+            trail.IsEmitting = value;
         }
     }
 
@@ -103,7 +103,7 @@ public partial class Player : Moveable.Moveable
         chargingSound = GetNode<AudioStreamPlayer2D>("ChargeSound");
 
         bulletSpawn = GetNode<Node2D>("BulletSpawn");
-        sprite = GetNode<GhostTrail>("Sprite2D");
+        trail = GetNode<GhostTrail>("Trail");
 
         invincibleTimer = GetNode<Timer>("InvincibleTimer");
         invincibleTimer.Timeout += () =>
@@ -122,7 +122,7 @@ public partial class Player : Moveable.Moveable
 
         hitParticle = GetNode<GpuParticles2D>("HitParticle");
 
-        sprite.Visible = false;
+        trail.Visible = false;
 
         engineSound = GetNode<AudioStreamPlayer>("EngineSound");
         reloadSound = GetNode<AudioStreamPlayer>("ReloadSound");
@@ -295,7 +295,7 @@ public partial class Player : Moveable.Moveable
 
     public void Start()
     {
-        sprite.Show();
+        trail.Show();
         Lives = startingLives;
         IsActive = true;
         IsDead = false;
@@ -348,7 +348,7 @@ public partial class Player : Moveable.Moveable
             ConfigureColliders(value);
             if (!isDead)
                 return;
-            sprite.Hide();
+            trail.Hide();
             IsActive = false;
             IsMoving = false;
             EmitSignal(SignalName.Dead);

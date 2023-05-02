@@ -1,7 +1,6 @@
 using Godot;
-using Shared;
 
-namespace Player;
+namespace Shared;
 
 public partial class GhostTrail : Sprite2D
 {
