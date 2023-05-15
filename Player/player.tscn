@@ -1,0 +1,189 @@
+[gd_scene load_steps=25 format=3 uid="uid://c6j1o3ex8fll4"]
+
+[ext_resource type="Script" path="res://Player/Player.cs" id="1_bhe4s"]
+[ext_resource type="Script" path="res://Player/States/Idle.cs" id="2_jv1s3"]
+[ext_resource type="PackedScene" uid="uid://q6cjlbo4ve0u" path="res://Player/PlayerBullet/player_bullet.tscn" id="2_qgw0c"]
+[ext_resource type="Script" path="res://Player/States/Move.cs" id="3_1uwoj"]
+[ext_resource type="Script" path="res://StateMachine/StateMachine.cs" id="3_7cq7a"]
+[ext_resource type="PackedScene" uid="uid://c4tp56jtkmm8d" path="res://Shared/trail.tscn" id="3_l75j8"]
+[ext_resource type="Script" path="res://Player/States/Dead.cs" id="4_6alcx"]
+[ext_resource type="Script" path="res://Player/States/Shoot.cs" id="7_drdju"]
+[ext_resource type="PackedScene" uid="uid://cy72ghwkujhi6" path="res://Explosion/explosion.tscn" id="11_6q6sm"]
+[ext_resource type="AudioStream" uid="uid://bfkh80p7ckg0l" path="res://Assets/flight_sound.ogg" id="12_6fnts"]
+[ext_resource type="AudioStream" uid="uid://bnq7nho2u8njx" path="res://Assets/zap2a.ogg" id="12_k3nj6"]
+[ext_resource type="AudioStream" uid="uid://b443alww8pwg6" path="res://Assets/Reload13.ogg" id="13_86v7j"]
+[ext_resource type="PackedScene" uid="uid://c2mym463o7fac" path="res://Shared/charge_particle.tscn" id="14_1rvyx"]
+[ext_resource type="AudioStream" uid="uid://dqknd8k4eqkii" path="res://Assets/Buff1.ogg" id="14_vajrm"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_lqjmw"]
+radius = 7.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_816yi"]
+radius = 60.0
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_yasx5"]
+load_path = "res://.godot/imported/simpleSpace_tilesheet.png-9656da49ac18d3fcdc07d6f1092eb749.ctex"
+
+[sub_resource type="Curve" id="Curve_h1qc8"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_wsbba"]
+curve = SubResource("Curve_h1qc8")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_flsf3"]
+lifetime_randomness = 0.25
+particle_flag_disable_z = true
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 5.0
+initial_velocity_max = 500.0
+angular_velocity_min = -720.0
+angular_velocity_max = 720.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+angle_min = -720.0
+angle_max = 720.0
+scale_min = 5.0
+scale_max = 10.0
+scale_curve = SubResource("CurveTexture_wsbba")
+
+[sub_resource type="Animation" id="Animation_y7w7x"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Trail:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_pce36"]
+resource_name = "invincible"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Trail:self_modulate")
+tracks/0/interp = 0
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.247059), Color(1, 1, 1, 1), Color(1, 1, 1, 0.247059), Color(1, 1, 1, 1), Color(1, 1, 1, 0.247059), Color(1, 1, 1, 1), Color(1, 1, 1, 0.247059), Color(1, 1, 1, 1), Color(1, 1, 1, 0.247059), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_un4f7"]
+_data = {
+"RESET": SubResource("Animation_y7w7x"),
+"invincible": SubResource("Animation_pce36")
+}
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_mbxmd"]
+streams_count = 1
+stream_0/stream = ExtResource("13_86v7j")
+stream_0/weight = 1.0
+
+[node name="Player" type="Node2D"]
+script = ExtResource("1_bhe4s")
+BulletScene = ExtResource("2_qgw0c")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_mask = 22
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_lqjmw")
+debug_color = Color(0, 0.6, 0.701961, 0.419608)
+
+[node name="RechargeArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 20
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RechargeArea"]
+shape = SubResource("CircleShape2D_816yi")
+
+[node name="Trail" parent="." instance=ExtResource("3_l75j8")]
+texture = SubResource("CompressedTexture2D_yasx5")
+
+[node name="BulletSpawn" type="Node2D" parent="."]
+position = Vector2(0, -40)
+
+[node name="BulletCooldownTimer" type="Timer" parent="."]
+one_shot = true
+autostart = true
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("3_7cq7a")
+
+[node name="Idle" type="Node" parent="StateMachine"]
+script = ExtResource("2_jv1s3")
+
+[node name="Move" type="Node" parent="StateMachine"]
+script = ExtResource("3_1uwoj")
+
+[node name="Dead" type="Node" parent="StateMachine"]
+script = ExtResource("4_6alcx")
+
+[node name="Shoot" type="Node" parent="StateMachine"]
+script = ExtResource("7_drdju")
+
+[node name="HitParticle" type="GPUParticles2D" parent="."]
+top_level = true
+emitting = false
+amount = 64
+process_material = SubResource("ParticleProcessMaterial_flsf3")
+one_shot = true
+explosiveness = 1.0
+randomness = 1.0
+
+[node name="Explosion" parent="." instance=ExtResource("11_6q6sm")]
+scale = Vector2(2, 2)
+
+[node name="InvincibleTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="RespawnTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
+[node name="RespawnAudio" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("12_k3nj6")
+volume_db = -4.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_un4f7")
+}
+
+[node name="EngineSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("12_6fnts")
+volume_db = -10.0
+
+[node name="ReloadTimer" type="Timer" parent="."]
+
+[node name="ReloadSound" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamRandomizer_mbxmd")
+
+[node name="ChargeParticle" parent="." instance=ExtResource("14_1rvyx")]
+
+[node name="ChargeSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("14_vajrm")
+
+[connection signal="area_entered" from="Area2D" to="." method="OnArea2d_Area_Entered"]
+[connection signal="area_exited" from="Area2D" to="." method="OnArea2d_Area_Exited"]
+[connection signal="body_entered" from="Area2D" to="." method="OnArea2d_Body_Entered"]
+[connection signal="body_exited" from="Area2D" to="." method="OnArea2d_Body_Exited"]
+[connection signal="timeout" from="BulletCooldownTimer" to="." method="OnBulletCooldownTimer_Timeout"]
+[connection signal="animation_finished" from="Explosion/AnimationPlayer" to="." method="OnAnimation_Player_Animation_Finished"]
+[connection signal="timeout" from="ReloadTimer" to="." method="OnReloadCooldownTimer_Timeout"]
+
+[editable path="Explosion"]

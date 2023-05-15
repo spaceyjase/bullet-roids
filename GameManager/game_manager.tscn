@@ -1,0 +1,198 @@
+[gd_scene load_steps=23 format=3 uid="uid://8urdypu2l7vh"]
+
+[ext_resource type="PackedScene" uid="uid://c6j1o3ex8fll4" path="res://Player/player.tscn" id="1_0rsnb"]
+[ext_resource type="Script" path="res://GameManager/GameManager.cs" id="1_dotxi"]
+[ext_resource type="PackedScene" uid="uid://daf17l5byew6k" path="res://Roid/roid.tscn" id="2_qr707"]
+[ext_resource type="Script" path="res://Shared/EffectsManager.cs" id="3_8ba77"]
+[ext_resource type="PackedScene" uid="uid://bkjs3ty1t8brx" path="res://Enemy/enemy.tscn" id="3_c6bey"]
+[ext_resource type="PackedScene" uid="uid://dokqgdrx5pyl6" path="res://UI/hud.tscn" id="3_ktvaq"]
+[ext_resource type="Environment" uid="uid://cb5eo2l7jo41" path="res://Shared/world_environment.tres" id="3_xrub7"]
+[ext_resource type="PackedScene" uid="uid://byxpfqp8c7d8a" path="res://Burst/burst.tscn" id="4_qg5kj"]
+[ext_resource type="PackedScene" uid="uid://ec7qb3ega1yo" path="res://Enemy/chaser.tscn" id="4_w6ta8"]
+[ext_resource type="Script" path="res://Camera/CameraShake.cs" id="4_yx7fg"]
+[ext_resource type="FastNoiseLite" uid="uid://qt8ccudr33cu" path="res://Shared/noise_resource.tres" id="5_4tciw"]
+[ext_resource type="AudioStream" uid="uid://julx8voig557" path="res://Assets/flying_spaceship.ogg" id="6_uf4pt"]
+[ext_resource type="AudioStream" uid="uid://bupcg3cyiw3re" path="res://Assets/Chipster1.ogg" id="8_qcfpf"]
+[ext_resource type="AudioStream" uid="uid://3wxloqjpea8v" path="res://Assets/GameStarting.ogg" id="13_l8r7v"]
+[ext_resource type="AudioStream" uid="uid://b4hh8qiocl1rl" path="res://Assets/ready.ogg" id="15_lh8sf"]
+[ext_resource type="AudioStream" uid="uid://c251xqtm7131e" path="res://Assets/game_over.ogg" id="16_y8ya3"]
+
+[sub_resource type="Animation" id="Animation_wvw2k"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Fader:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.0666667, 0.105882, 0.141176, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_jwg8d"]
+resource_name = "fade_out"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Fader:color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0.0666667, 0.105882, 0.141176, 1), Color(0.0666667, 0.105882, 0.141176, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_g6xu7"]
+_data = {
+"RESET": SubResource("Animation_wvw2k"),
+"fade_out": SubResource("Animation_jwg8d")
+}
+
+[sub_resource type="Curve" id="Curve_a1q4m"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.26455, 1), 0.0, 0.0, 0, 0, Vector2(0.502646, 0), 0.0, 0.0, 0, 0, Vector2(0.746032, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 5
+
+[sub_resource type="CurveTexture" id="CurveTexture_ikrhi"]
+curve = SubResource("Curve_a1q4m")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_u6hjc"]
+emission_shape = 3
+emission_box_extents = Vector3(576, 400, 1)
+particle_flag_disable_z = true
+spread = 0.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 0.5
+initial_velocity_max = 1.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+scale_min = 0.1
+scale_curve = SubResource("CurveTexture_ikrhi")
+
+[node name="GameManager" type="Node"]
+process_mode = 3
+script = ExtResource("1_dotxi")
+viewportPath = NodePath("SubViewportContainer/SubViewport")
+roidScene = ExtResource("2_qr707")
+enemyScene = ExtResource("3_c6bey")
+chaseEnemyScene = ExtResource("4_w6ta8")
+burstScene = ExtResource("4_qg5kj")
+roidParentPath = NodePath("SubViewportContainer/SubViewport/Roids")
+enemyParentPath = NodePath("SubViewportContainer/SubViewport/Enemies")
+bulletParentPath = NodePath("SubViewportContainer/SubViewport/Bullets")
+particleParentPath = NodePath("SubViewportContainer/SubViewport/Particles")
+
+[node name="EffectsManager" type="Node" parent="."]
+script = ExtResource("3_8ba77")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="HUD" parent="." instance=ExtResource("3_ktvaq")]
+
+[node name="Fader" type="ColorRect" parent="HUD"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0666667, 0.105882, 0.141176, 1)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="HUD"]
+autoplay = "fade_out"
+libraries = {
+"": SubResource("AnimationLibrary_g6xu7")
+}
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+process_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -340.0
+offset_right = 576.0
+offset_bottom = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+handle_input_locally = false
+audio_listener_enable_2d = true
+size = Vector2i(1152, 740)
+render_target_update_mode = 4
+
+[node name="SpaceParticles" type="GPUParticles2D" parent="SubViewportContainer/SubViewport"]
+position = Vector2(576, 400)
+scale = Vector2(3, 3)
+amount = 1000
+process_material = SubResource("ParticleProcessMaterial_u6hjc")
+lifetime = 30.0
+preprocess = 30.0
+local_coords = true
+
+[node name="Camera2D" type="Camera2D" parent="SubViewportContainer/SubViewport" groups=["Camera"]]
+anchor_mode = 0
+zoom = Vector2(0.6, 0.6)
+editor_draw_limits = true
+script = ExtResource("4_yx7fg")
+maxAmplitude = 50.0
+noiseResource = ExtResource("5_4tciw")
+
+[node name="Player" parent="SubViewportContainer/SubViewport" instance=ExtResource("1_0rsnb")]
+FireRate = 0.05
+
+[node name="Roids" type="Node" parent="SubViewportContainer/SubViewport"]
+
+[node name="Bullets" type="Node" parent="SubViewportContainer/SubViewport"]
+
+[node name="Particles" type="Node" parent="SubViewportContainer/SubViewport"]
+
+[node name="Enemies" type="Node" parent="SubViewportContainer/SubViewport"]
+
+[node name="EnemyTimer" type="Timer" parent="."]
+
+[node name="ChaserTimer" type="Timer" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource("3_xrub7")
+
+[node name="BackgroundSoundPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_uf4pt")
+volume_db = -10.0
+autoplay = true
+
+[node name="LevelUpSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("13_l8r7v")
+volume_db = -2.0
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_qcfpf")
+volume_db = -6.0
+
+[node name="ReadyPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("15_lh8sf")
+volume_db = 2.0
+
+[node name="GameOverPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("16_y8ya3")
+volume_db = 2.0
+
+[connection signal="Dead" from="SubViewportContainer/SubViewport/Player" to="." method="GameOver"]
+[connection signal="LivesChanged" from="SubViewportContainer/SubViewport/Player" to="HUD" method="OnLivesUpdated"]

@@ -1,0 +1,123 @@
+[gd_scene load_steps=12 format=3 uid="uid://bkjs3ty1t8brx"]
+
+[ext_resource type="Script" path="res://Enemy/Enemy.cs" id="1_kj6ka"]
+[ext_resource type="PackedScene" uid="uid://bdxn0xl05dmoy" path="res://Enemy/Bullet/enemy_bullet.tscn" id="2_hrdxe"]
+[ext_resource type="Texture2D" uid="uid://b0jlg5sj65miq" path="res://Assets/simpleSpace_tilesheet@2.png" id="2_ld7co"]
+[ext_resource type="PackedScene" uid="uid://cy72ghwkujhi6" path="res://Explosion/explosion.tscn" id="2_onha4"]
+[ext_resource type="PackedScene" uid="uid://ce3c3ewuoc8pi" path="res://Enemy/enemy_paths.tscn" id="3_8xee3"]
+[ext_resource type="Animation" uid="uid://imvfmc0uank4" path="res://Shared/Animations/flash.res" id="4_fihmx"]
+[ext_resource type="AudioStream" uid="uid://c8n0f8wtslrmy" path="res://Assets/Despawn7.ogg" id="6_ndm7c"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kcl4d"]
+radius = 42.0
+
+[sub_resource type="Animation" id="Animation_sqgdb"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_pyfyb"]
+resource_name = "rotate"
+length = 3.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 6.28319]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_236ir"]
+_data = {
+"RESET": SubResource("Animation_sqgdb"),
+"flash": ExtResource("4_fihmx"),
+"rotate": SubResource("Animation_pyfyb")
+}
+
+[node name="Enemy" type="Area2D" groups=["enemies"]]
+collision_layer = 2
+collision_mask = 9
+monitoring = false
+script = ExtResource("1_kj6ka")
+BulletScene = ExtResource("2_hrdxe")
+pulseAmount = 6
+shootDelay = 0.12
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_kcl4d")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_ld7co")
+hframes = 8
+vframes = 6
+frame = 21
+region_rect = Rect2(328, 136, 48, 48)
+
+[node name="Spawn" type="Node2D" parent="Sprite2D"]
+position = Vector2(0, -52)
+
+[node name="Spawn2" type="Node2D" parent="Sprite2D"]
+position = Vector2(0, 52)
+rotation = 3.14159
+
+[node name="Spawn3" type="Node2D" parent="Sprite2D"]
+position = Vector2(52, 0)
+rotation = 1.5708
+
+[node name="Spawn4" type="Node2D" parent="Sprite2D"]
+position = Vector2(-52, 0)
+rotation = -1.5708
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+autoplay = "rotate"
+libraries = {
+"": SubResource("AnimationLibrary_236ir")
+}
+
+[node name="Explosion" parent="." instance=ExtResource("2_onha4")]
+scale = Vector2(2, 2)
+
+[node name="EnemyPaths" parent="." instance=ExtResource("3_8xee3")]
+
+[node name="GunTimer" type="Timer" parent="."]
+wait_time = 1.5
+autostart = true
+
+[node name="FlipTimer" type="Timer" parent="."]
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_ndm7c")
+autoplay = true
+bus = &"SFX"
+
+[connection signal="animation_finished" from="Explosion/AnimationPlayer" to="." method="OnAnimation_Player_Animation_Finished"]
+
+[editable path="Explosion"]

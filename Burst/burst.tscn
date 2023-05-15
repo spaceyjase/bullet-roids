@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://byxpfqp8c7d8a"]
+
+[ext_resource type="Script" path="res://Burst/Burst.cs" id="1_j72r5"]
+[ext_resource type="PackedScene" uid="uid://dfltn36xdnxjy" path="res://Burst/Bullet/burst_bullet.tscn" id="2_2t7qn"]
+
+[node name="Burst" type="Node2D"]
+script = ExtResource("1_j72r5")
+burstAmount = 30
+BulletScene = ExtResource("2_2t7qn")
