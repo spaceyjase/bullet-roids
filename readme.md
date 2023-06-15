@@ -7,3 +7,7 @@ You can download the game here: https://jason-indie.itch.io/bullet-roids
 The game uses the [godot engine](https://godotengine.org/) (4) and is written in C#. 
 
 Provided 'as is' due to some licensed assets being removed.
+
+## SAST Tools
+
+[PVS-Studio](https://pvs-studio.com/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code.
